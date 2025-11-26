@@ -1,5 +1,5 @@
 # Fil Rouge UTT
-![Image du projet](Fil-Rouge-UTT/Image-presentation-projet.png)
+![Image du projet](Image-presentation-projet.png)
 
 **Présentation :**  
 Ce projet fait partie du Master Spécialisé Big Data et constitue le fil rouge permettant d'appliquer les notions vues en cours tout au long de la formation. Le projet consiste en la création d'un modèle de prédiction de la maladie du diabète.
