@@ -1,6 +1,6 @@
 # Fil Rouge UTT
 <p align="center">
-  <img src="logoblancdl.svg" alt="Image du projet" width="500"/>
+  <img src="logoblancdl.svg" alt="Image du projet" width="400"/>
 </p>
 
 **Présentation :**  
