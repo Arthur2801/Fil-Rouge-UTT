@@ -3,7 +3,7 @@
   <img src="logoblancdl.svg" alt="Image du projet" width="400"/>
 </p>
 
-**Présentation :**  
+## Présentation :  
 Projet annuel dans le cadre du Master Spécialisé Big Data Engineer à l'UTT. Le projet consiste en la création d'une application pour améliorer la recherche de produits sur le site Dealabs.
 
 ## Objectifs
