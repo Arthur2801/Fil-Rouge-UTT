@@ -1,5 +1,5 @@
 # Fil Rouge UTT
-![Image du projet](imgreadme.png)
+<img src="imgreadme.png" alt="Image du projet" width="200"/>
 
 **Présentation :**  
 Projet annuel dans le cadre du Master Spécialisé Big Data à l'UTT. Le projet consiste en la création d'une application pour améliorer la recherche de produits sur le site Dealabs.
