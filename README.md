@@ -1,16 +1,10 @@
 # Fil Rouge UTT
-![Image du projet](Image-presentation-projet.png)
+![Image du projet](imgreadme.png)
 
 **Présentation :**  
-Ce projet fait partie du Master Spécialisé Big Data et constitue le fil rouge permettant d'appliquer les notions vues en cours tout au long de la formation. Le projet consiste en la création d'un modèle de prédiction de la maladie du diabète.
+Projet annuel dans le cadre du Master Spécialisé Big Data à l'UTT. Le projet consiste en la création d'une application pour améliorer la recherche de produits sur le site Dealabs.
 
 ## Objectifs
-- Mettre en pratique les concepts et outils étudiés durant la formation.
-- Construire un modèle de machine learning pour prédire la probabilité de diabète.
-- Évaluer et améliorer la performance du modèle.
-
-## Contenu du projet
-- Prétraitement et exploration des données
-- Sélection et entraînement des modèles
-- Évaluation des performances
-- Visualisation et interprétation des résultats
+- Prédiction de la température des deals recemments publiés
+- Mise en place d'un agent conversationnel
+- Déploiement d'une application web en python
