@@ -49,9 +49,7 @@ class Dealabs:
             'limit':'50'
         }
         params = {**new_options, **params}
-        req = self.request(url=API_DEAL_THREAD, params=params)
-        deals_data = req.get('data', [])
-        return [Deal(deal_data) for deal_data in deals_data]
+        return self.request(url=API_DEAL_THREAD, params=params)
 
     def get_thread(self, thread_id, params={}):
         """

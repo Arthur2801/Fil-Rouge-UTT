@@ -9,8 +9,8 @@ def main():
     page = 0
     per_page = 50  # Limite max de l'API
     
-    while len(all_deals) < 10:
-        response = client.get_hot_deals(params={'page': page, 'limit': per_page})
+    while len(all_deals) < 10000:
+        response = client.get_new_deals(params={'page': page, 'limit': per_page})
         deals_data = response.get('data', [])
         
         if not deals_data:
@@ -20,7 +20,7 @@ def main():
         page += 1
         print(f"Récupéré {len(all_deals)} deals...")
     
-    all_deals = all_deals[:10]  # Limiter à 1000
+    all_deals = all_deals[:1000]  # Limiter à 1000
     deals_by_thread_id = {}
     # Récupérer les commentaires pour chaque deal
     for i, deal in enumerate(all_deals):
