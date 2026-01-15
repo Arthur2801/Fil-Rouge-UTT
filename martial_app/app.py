@@ -13,7 +13,7 @@ def main():
     """
     st.set_page_config(page_title="Dealabs Smart Search", page_icon="🚀")
     
-    st.title("Assistant Intelligent Dealabs 🚀")
+    st.title("Assistant Intelligent Dealabs ")
     st.write("Trouvez les meilleurs bons plans grâce à l'IA générative.")
 
     # Zone de saisie utilisateur
