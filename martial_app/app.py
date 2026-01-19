@@ -29,7 +29,7 @@ def main():
     # Sidebar : Logo et Filtres
     logo_img = load_logo()
     if logo_img:
-        st.sidebar.image(logo_img, use_container_width=True)
+        st.sidebar.image(logo_img, use_column_width=True)
     else:
         st.sidebar.title("Projet IA Gen")
 
@@ -42,7 +42,7 @@ def main():
 
     # Zone principale
     st.title("Assistant Intelligent Dealabs 🤖")
-    st.write("Trouvez les meilleures offres parmi nos 15 000 deals indexés.")
+    st.write("Trouvez les meilleures offres parmi nos deals.")
 
     user_query = st.text_input(
         "Que cherchez-vous ?", 
