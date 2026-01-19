@@ -1,59 +1,63 @@
 """
-Logique métier pour le système RAG (Retrieval Augmented Generation).
-Gère la connexion à Elasticsearch et la recherche vectorielle.
+Logique RAG utilisant MongoDB Atlas Vector Search.
+Utilise le modèle all-MiniLM-L6-v2 pour la cohérence avec l'indexation.
 """
 
-from elasticsearch import Elasticsearch
+import os
+from pymongo import MongoClient
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
 
-def get_elasticsearch_client():
+def get_deals_rag(query, category_filter="Toutes", max_price=1000):
     """
-    Initialise et retourne le client Elasticsearch.
-    À modifier avec l'URL Cloud fournie par Yasin si nécessaire.
+    Exécute une recherche vectorielle filtrée sur MongoDB Atlas.
     """
-    # Remplacer 'localhost' par l'URL cloud si Yasin a déployé la base
-    return Elasticsearch("http://localhost:9200")
-
-
-def search_deals(query):
-    """
-    Recherche les deals les plus pertinents dans la base vectorielle.
-    """
-    es = get_elasticsearch_client()
-    
-    # Initialisation du modèle d'embedding (doit être le même que celui de Yasin)
-    embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-    
-    # Transformation de la question utilisateur en vecteur numérique
-    query_vector = embeddings.embed_query(query)
-    
-    # Requête de recherche par similarité cosinus dans l'index de Yasin
-    # On ajoute +1.0 pour éviter les scores négatifs
-    search_query = {
-        "script_score": {
-            "query": {"match_all": {}},
-            "script": {
-                "source": "cosineSimilarity(params.query_vector, 'vector_field') + 1.0",
-                "params": {"query_vector": query_vector}
-            }
-        }
-    }
-    
-    response = es.search(
-        index="dealabs_index",  # Nom de l'index créé par Yasin
-        query=search_query
+    # Récupération sécurisée de l'URI (Chaîne de connexion de Yassine)
+    mongo_uri = os.getenv(
+        "MONGO_URI", 
+        "mongodb+srv://dev_team:filrougeutt@cluster0.ou16sxf.mongodb.net/?appName=Cluster0"
     )
     
-    return response['hits']['hits']
+    client = MongoClient(mongo_uri)
+    db = client["deals_db"]
+    collection = db["deals"]
 
+    # Initialisation du modèle d'embedding (Identique à celui de Yassine)
+    model_path = "sentence-transformers/all-MiniLM-L6-v2"
+    embeddings = HuggingFaceEmbeddings(model_name=model_path)
+    query_vector = embeddings.embed_query(query)
 
-def format_context(results):
-    """
-    Extrait et nettoie les informations des résultats pour le LLM.
-    """
-    context_text = ""
-    for hit in results:
-        source = hit['_source']
-        context_text += f"\n- Produit: {source.get('title')} | Prix: {source.get('price')}€"
-    return context_text
+    # Configuration des Filter Fields (Pré-filtrage Atlas)
+    search_filter = {"price": {"$lte": max_price}}
+    if category_filter != "Toutes":
+        search_filter["category"] = category_filter
+
+    # Pipeline de recherche vectorielle
+    pipeline = [
+        {
+            "$vectorSearch": {
+                "index": "vector_index",
+                "path": "vector_field",
+                "queryVector": query_vector,
+                "numCandidates": 100,
+                "limit": 5,
+                "filter": search_filter
+            }
+        },
+        {
+            "$project": {
+                "_id": 0,
+                "title": 1,
+                "price": 1,
+                "category": 1,
+                "url": 1,
+                "score": {"$meta": "vectorSearchScore"}
+            }
+        }
+    ]
+
+    try:
+        return list(collection.aggregate(pipeline))
+    except Exception as error:
+        print(f"Erreur lors de la requête MongoDB : {error}")
+        return []
