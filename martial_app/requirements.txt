@@ -1,4 +1,21 @@
-streamlit==1.39.0
-elasticsearch==8.16.0
-langchain-community==0.3.15
-sentence-transformers==3.3.1
+# --- Interface Utilisateur ---
+streamlit
+
+# --- Connexion Base de Données (MongoDB Atlas) ---
+# Nécessaire pour l'URI mongodb+srv://
+pymongo[srv]
+dns_python
+
+# --- Intelligence Artificielle & RAG ---
+# Modèle : sentence-transformers/all-MiniLM-L6-v2
+langchain
+langchain-community
+sentence-transformers
+# Installation de torch version CPU pour plus de légèreté
+torch --index-url https://download.pytorch.org/whl/cpu
+
+# --- Utilitaires ---
+# Pour la gestion du logo "notre_logo"
+pillow
+# Pour la gestion sécurisée des variables d'environnement
+python-dotenv
