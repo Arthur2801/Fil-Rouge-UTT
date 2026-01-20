@@ -1,2 +1,81 @@
-# Application RAG - Martial (contenu à organiser plus tard)
-📝 Présentation Globale du Projet : Dealabs Smart SearchL'objectif de ce projet est de transformer la recherche classique de deals sur Dealabs en une expérience intelligente et prédictive en utilisant l'IA Générative2222.+1🏗️ Architecture du ProjetLe projet est divisé en trois piliers complémentaires portés par notre équipe de 3 personnes3:Collecte & Indexation (Yasin) : Récupération de +15 000 deals via une API JSON et stockage dans une VectorDB (Elasticsearch)4444.+1ML & Enrichissement (Arthur) : Analyse de sentiments et prédiction de la température (popularité) pour chaque deal5.Interface & Intelligence RAG (Martial - Ma partie) : Développement de l'application Web Streamlit et moteur de recherche sémantique (RAG) pour interroger intelligemment la base de données66666.+4🛠️ Mes Réalisations (Martial)Dans le cadre de ce projet, j'ai pris en charge la couche logicielle finale qui fait le lien entre les données brutes et l'utilisateur7. Voici le détail de mes interventions :1. Développement de l'Interface Utilisateur (Streamlit)Conception d'une interface web ergonomique en Python permettant de centraliser les fonctionnalités du projet8888.+1Intégration des filtres avancés pour permettre à l'utilisateur de trier les deals, notamment par la température prédite par Arthur9.Affichage dynamique des résultats sous forme de cartes interactives (Expanders)10.2. Moteur de Recherche RAG (Retrieval Augmented Generation)Mise en place d'un agent conversationnel capable de comprendre les requêtes complexes (ex: "Trouve-moi un smartphone similaire mais moins cher")11111111.+1Développement de la logique de récupération sémantique : transformation de la question utilisateur en vecteur (Embedding) pour interroger l'index Elasticsearch de Yasin12.Préparation de la structure pour connecter le contexte récupéré à un LLM Open Source (via Ollama) afin de générer une réponse naturelle13131313.+13. Industrialisation & DevOpsConteneurisation de l'application via Docker pour garantir un déploiement facile et reproductible sur n'importe quel environnement14141414.+1Gestion du versionnement avec Git sur notre dépôt commun, en respectant la structure modulaire du code151515.+1Rédaction de la documentation technique et respect des normes PEP8 pour la lisibilité du code16161616.+1🚀 Choix Techniques & LimitationsTechnologieUsageJustificationStreamlitInterface WebRapidité de développement et déploiement facile sur le Cloud17.ElasticsearchVectorDBCapacité à gérer la recherche vectorielle sur plus de 15 000 documents18.HuggingFaceEmbeddingsUtilisation de modèles gratuits et performants (all-MiniLM-L6-v2)19.DockerDéploiementIsolation de l'application et respect des contraintes techniques20202020.+1Limitations actuelles :La vitesse de réponse dépend de la puissance de la machine faisant tourner le LLM en local (Ollama)21.L'application nécessite une connexion active à la base Elasticsearch de Yasin.
+
+# Titre: Assistant Intelligent Dealabs
+
+# Description du projet
+Cette application est un assistant de recherche intelligent utilisant l'architecture RAG (Retrieval-Augmented Generation). Contrairement à une recherche classique par mots-clés, cet outil utilise la recherche sémantique pour comprendre l'intention de l'utilisateur et interroger une base de données vectorielle MongoDB Atlas.
+
+
+## Déploiement Cloud
+L'application est officiellement déployée et accessible pour test via le lien suivant : 👉 [LIEN DE VOTRE APPLI SUR STREAMLIT CLOUD]
+
+
+## Fonctionnalités
+- Recherche Sémantique : Capacité à trouver des produits par concept (ex: "ordinateur pour montage vidéo" au lieu de "PC 16Go RAM").
+
+- Filtrage Hybride : Affinage des résultats par budget (curseur de prix) et par catégories dynamiques.
+
+- Interface Intuitive : Développée avec Streamlit pour une expérience utilisateur fluide.
+
+- Accès Direct : Boutons de redirection vers les sites marchands intégrés à chaque article.
+
+
+## Architecture Technique
+- Base de Données : MongoDB Atlas avec Vector Search Index.
+
+- Modèle d'Embedding : sentence-transformers/all-MiniLM-L6-v2 (Hugging Face).
+
+- Backend : Python 3.11+ avec LangChain pour l'orchestration.
+
+- Frontend : Streamlit.
+
+- Industrialisation : Projet prêt pour la conteneurisation via Docker.
+
+## Structure du Dépôt
+
+<img src="images_readme/structure.PNG" alt="structure" width="624" height="170">
+## Structure du Dépôt
+
+![structure](structure.png)
+
+
+## Configuration pour les Développeurs
+
+1. Variables d'environnement
+Pour faire tourner le projet localement, créez un fichier .env :
+
+MONGO_URI=mongodb+srv://<votre_user>:<votre_password>@cluster0.ou16sxf.mongodb.net/
+
+
+Note : Pour la version déployée, ces identifiants sont gérés via les Secrets de Streamlit Cloud.
+
+2. Index de recherche Atlas
+L'index sur MongoDB doit être nommé vector_index et configurer le champ embedding avec 384 dimensions.
+
+
+## Installation Locale
+
+1. Cloner la branche : 
+git checkout <ma-branche-de-travail> (Bash)
+
+2. Installer les dépendances :
+pip install -r requirements.txt (Bash)
+
+3. Lancer l'application :
+streamlit run app.py (Bash)
+
+
+## Schéma des Métadonnées (Mapping)
+
+- embedding: Vecteurs IA (384 dim)
+- group_display_summary: Catégories utilisées pour le filtrage
+- price: Prix numérique pour le filtrage par budget
+- url: Lien source pour la redirection
+- text: Description complète de l'article
+
+
+## Authors
+
+- Arthur
+- Martial
+- Yassine
+
