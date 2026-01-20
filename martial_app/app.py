@@ -1,77 +1,37 @@
-"""
-Interface Streamlit pour la recherche intelligente de produits Dealabs.
-"""
-
 import streamlit as st
-from PIL import Image
 import os
-from rag_logic import get_deals_rag
-
-
-def load_logo():
-    """Charge le logo du projet 'notre_logo' depuis le dossier local."""
-    # Liste des extensions possibles pour votre fichier
-    for ext in [".png", ".jpg", ".jpeg", ".webp"]:
-        logo_path = f"notre_logo{ext}"
-        if os.path.exists(logo_path):
-            return Image.open(logo_path)
-    return None
-
+from PIL import Image
+from rag_logic import get_deals_rag, get_unique_categories
 
 def main():
-    """Fonction principale de l'application web."""
-    st.set_page_config(
-        page_title="Dealabs Smart Search", 
-        page_icon="🔥", 
-        layout="wide"
-    )
+    st.set_page_config(page_title="Dealabs Smart Search", page_icon="🔥")
 
-    # Sidebar : Logo et Filtres
-    logo_img = load_logo()
-    if logo_img:
-        st.sidebar.image(logo_img, use_column_width=True)
-    else:
-        st.sidebar.title("Projet IA Gen")
+    # Gestion du logo avec correction de dépréciation
+    if os.path.exists("notre_logo.png"):
+        logo = Image.open("notre_logo.png")
+        # On utilise 'use_container_width' car 'use_column_width' est déprécié
+        st.sidebar.image(logo, use_container_width=True)
 
-    st.sidebar.markdown("---")
-    st.sidebar.header("🔍 Critères de recherche")
-    
-    cat_list = ["Toutes", "Informatique", "Smartphone", "Audio", "Jeux Vidéo"]
-    selected_cat = st.sidebar.selectbox("Choisir une catégorie", cat_list)
-    max_p = st.sidebar.slider("Budget maximum (€)", 0, 2000, 500)
+    # Interface Sidebar
+    categories = get_unique_categories()
+    selected_cat = st.sidebar.selectbox("Choisir un groupe", categories)
+    max_p = st.sidebar.slider("Budget maximum (€)", 0, 5000, 1200)
 
-    # Zone principale
     st.title("Assistant Intelligent Dealabs 🤖")
-    st.write("Trouvez les meilleures offres parmi nos deals.")
+    query = st.text_input("Que cherchez-vous ?", placeholder="ex: ordinateur pour jouer")
 
-    user_query = st.text_input(
-        "Que cherchez-vous ?", 
-        placeholder="Ex: Un écran PC pour faire du montage vidéo..."
-    )
-
-    if user_query:
-        with st.spinner("Recherche sémantique en cours..."):
-            results = get_deals_rag(
-                user_query, 
-                category_filter=selected_cat, 
-                max_price=max_p
-            )
-
+    if query:
+        with st.spinner("Recherche sémantique..."):
+            results = get_deals_rag(query, selected_cat, max_p)
+            
             if results:
-                st.success(f"{len(results)} deals pertinents trouvés !")
                 for deal in results:
-                    with st.container():
-                        c1, c2 = st.columns([4, 1])
-                        with c1:
-                            st.subheader(deal['title'])
-                            st.info(f"Catégorie : {deal['category']}")
-                        with c2:
-                            st.write(f"### {deal['price']} €")
-                            st.link_button("Voir l'offre", deal['url'])
-                        st.divider()
+                    st.subheader(f"{deal['title']} - {deal['price']}€")
+                    # Affichage du groupe dynamique
+                    st.write(f"Groupe : {deal.get('group_display_summary', 'N/A')}")
+                    st.divider()
             else:
-                st.warning("Aucun deal ne correspond à votre recherche actuelle.")
-
+                st.warning("Aucun deal ne correspond. Vérifiez l'index vectoriel Atlas.")
 
 if __name__ == "__main__":
     main()

@@ -10,6 +10,7 @@ dns_python
 # Modèle : sentence-transformers/all-MiniLM-L6-v2
 langchain
 langchain-community
+langchain-huggingface
 sentence-transformers
 # Installation de torch version CPU pour plus de légèreté
 torch --index-url https://download.pytorch.org/whl/cpu
