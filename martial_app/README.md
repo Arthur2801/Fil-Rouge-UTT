@@ -6,9 +6,7 @@ Cette application est un assistant de recherche intelligent utilisant l'architec
 
 
 ## Déploiement Cloud
-L'application est officiellement déployée et accessible pour test via le lien suivant : 👉 [LIEN DE VOTRE APPLI SUR STREAMLIT CLOUD]
-
-
+L'application est officiellement déployée et accessible pour test via le lien suivant : 👉 https://martial-dealabs-raggit-dq2ot2gjjmgdq83mwhmoj2.streamlit.app/
 ## Fonctionnalités
 - Recherche Sémantique : Capacité à trouver des produits par concept (ex: "ordinateur pour montage vidéo" au lieu de "PC 16Go RAM").
 
@@ -17,8 +15,6 @@ L'application est officiellement déployée et accessible pour test via le lien 
 - Interface Intuitive : Développée avec Streamlit pour une expérience utilisateur fluide.
 
 - Accès Direct : Boutons de redirection vers les sites marchands intégrés à chaque article.
-
-
 ## Architecture Technique
 - Base de Données : MongoDB Atlas avec Vector Search Index.
 
@@ -29,15 +25,6 @@ L'application est officiellement déployée et accessible pour test via le lien 
 - Frontend : Streamlit.
 
 - Industrialisation : Projet prêt pour la conteneurisation via Docker.
-
-## Structure du Dépôt
-
-<img src="images_readme/structure.PNG" alt="structure" width="624" height="170">
-## Structure du Dépôt
-
-![structure](structure.png)
-
-
 ## Configuration pour les Développeurs
 
 1. Variables d'environnement
@@ -50,8 +37,6 @@ Note : Pour la version déployée, ces identifiants sont gérés via les Secrets
 
 2. Index de recherche Atlas
 L'index sur MongoDB doit être nommé vector_index et configurer le champ embedding avec 384 dimensions.
-
-
 ## Installation Locale
 
 1. Cloner la branche : 
@@ -62,8 +47,6 @@ pip install -r requirements.txt (Bash)
 
 3. Lancer l'application :
 streamlit run app.py (Bash)
-
-
 ## Schéma des Métadonnées (Mapping)
 
 - embedding: Vecteurs IA (384 dim)
@@ -71,8 +54,6 @@ streamlit run app.py (Bash)
 - price: Prix numérique pour le filtrage par budget
 - url: Lien source pour la redirection
 - text: Description complète de l'article
-
-
 ## Authors
 
 - Arthur
