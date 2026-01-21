@@ -73,8 +73,14 @@ def get_llm_answer(query, context_documents):
         "Le iPhone 13 offre le meilleur rapport qualité-prix..."
     """
     # --- RÉCUPÉRATION DE LA CLÉ API ---
-    # Récupère la clé gsk_... depuis les variables d'environnement
+    # On récupère la clé enregistrée dans les secrets de Streamlit
     api_key = os.getenv("GROQ_API_KEY")
+
+    # On passe explicitement la clé au client ChatGroq
+    llm = ChatGroq(
+        groq_api_key=api_key, # <--- AJOUTER CETTE LIGNE
+        model_name="mixtral-8x7b-32768", 
+        temperature=0)
 
     # --- INITIALISATION DU LLM ---
     # Configuration du client GROQ avec:
