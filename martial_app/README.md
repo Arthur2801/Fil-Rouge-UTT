@@ -7,6 +7,7 @@ Cette application est un assistant de recherche intelligent utilisant l'architec
 
 ## Déploiement Cloud
 L'application est officiellement déployée et accessible pour test via le lien suivant : 👉 https://martial-dealabs-raggit-dq2ot2gjjmgdq83mwhmoj2.streamlit.app/
+
 ## Fonctionnalités
 - Recherche Sémantique : Capacité à trouver des produits par concept (ex: "ordinateur pour montage vidéo" au lieu de "PC 16Go RAM").
 
