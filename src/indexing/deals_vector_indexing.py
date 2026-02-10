@@ -13,7 +13,7 @@ from pymongo.errors import BulkWriteError
 from pymongo.operations import SearchIndexModel
 from sentence_transformers import SentenceTransformer
 
-PROJECT_ROOT = Path(__file__).parent.parent
+PROJECT_ROOT = Path(__file__).parent.parent.parent
 load_dotenv(PROJECT_ROOT / ".env")
 
 
@@ -152,6 +152,24 @@ class DealProcessor:
         return random.choice(best_comments).get("content_unformatted")
     
     @staticmethod
+    def get_all_comments(deal: dict) -> Optional[str]:
+        """Récupère tous les commentaires d'un deal et les concatène en une seule chaîne."""
+        comments = deal.get("comments", [])
+        if not comments:
+            return None
+        
+        all_comments_text = []
+        for comment in comments:
+            content = comment.get("content_unformatted")
+            if content:
+                all_comments_text.append(content)
+        
+        if not all_comments_text:
+            return None
+        
+        return " | ".join(all_comments_text)
+    
+    @staticmethod
     def parse_price(price) -> Optional[float]:
         if price is None:
             return None
@@ -189,14 +207,31 @@ class DealProcessor:
         if len(embedding) != self.embedding_service.embedding_dims:
             return None
 
+        poster = deal.get("poster", {})
+        main_group = deal.get("main_group", {})
+        best_badge = poster.get("best_badge", {})
+        merchant = deal.get("merchant", {})
+        all_comments = self.get_all_comments(deal)
+
         return {
             "_id": deal_id,
             "title": deal.get("title"),
             "text": text,
+            "all_comments": all_comments,
             "html_stripped_description": deal.get("html_stripped_description"),
             "group_display_summary": deal.get("group_display_summary"),
             "price": self.parse_price(deal.get("price")),
             "url": deal.get("deal_uri"),
+            "local": deal.get("local"),
+            "temperature_rating": deal.get("temperature_rating"),
+            "price_discount": deal.get("price_discount"),
+            "shipping_costs": self.parse_price(deal.get("shipping_costs")),
+            "next_best_price": self.parse_price(deal.get("next_best_price")),
+            "main_group_name": main_group.get("name"),
+            "poster_likes_received": poster.get("likes_received"),
+            "poster_badge_level": best_badge.get("level"),
+            "is_new": deal.get("is_new"),
+            "merchant_name": merchant.get("name"),
             "embedding": embedding
         }
 
