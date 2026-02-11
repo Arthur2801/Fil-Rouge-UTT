@@ -224,7 +224,7 @@ def get_unique_categories():
         # --- EXTRACTION DES CATÉGORIES DISTINCTES ---
         # distinct() retourne toutes les valeurs uniques d'un champ
         # Équivalent SQL: SELECT DISTINCT group_display_summary
-        categories = collection.distinct("group_display_summary")
+        categories = collection.distinct("main_group_name")
         
         # --- FILTRAGE DES VALEURS INVALIDES ---
         # Liste comprehension pour éliminer:
