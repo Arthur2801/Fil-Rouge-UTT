@@ -354,7 +354,7 @@ def get_deals_rag(query, category_filter="Toutes", max_price=1200):
     # Ajout conditionnel du filtre de catégorie
     # Si "Toutes" est sélectionné, pas de filtre de catégorie
     if category_filter != "Toutes":
-        search_filter["group_display_summary"] = category_filter
+        search_filter["main_group_name"] = category_filter
 
     # --- PHASE 3 : PIPELINE D'AGRÉGATION MONGODB ---
     # Construction du pipeline d'agrégation en 2 étapes
@@ -395,7 +395,7 @@ def get_deals_rag(query, category_filter="Toutes", max_price=1200):
             "$project": {
                 "title": 1,  # Titre du deal
                 "price": 1,  # Prix en euros
-                "group_display_summary": 1,  # Catégorie du deal
+                "main_group_name": 1,  # Catégorie du deal
                 "url": 1,  # Lien vers la page Dealabs
                 "text": 1,  # Description complète du deal
                 
