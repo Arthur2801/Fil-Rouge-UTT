@@ -138,11 +138,32 @@ def main():
 
             # --- LOGIQUE DE FILTRAGE ML ---
             if show_only_new and results:
-                # On ne garde que les deals où Arthur a mis is_new à True
-                results = [d for d in results if d.get('is_new') is True]
+                from datetime import datetime, timezone
+                # Filtrer uniquement les deals avec durée < 24h
+                filtered_results = []
+                now = datetime.now(timezone.utc)
+                
+                for deal in results:
+                    deal_date = deal.get('date')
+                    if deal_date:
+                        # Conversion de la date
+                        if isinstance(deal_date, (int, float)):
+                            deal_datetime = datetime.fromtimestamp(deal_date, tz=timezone.utc)
+                        else:
+                            deal_datetime = deal_date
+                        
+                        # Calcul de la durée en heures
+                        delta = now - deal_datetime
+                        hours = delta.total_seconds() / 3600
+                        
+                        # Ne garder que les deals < 24h avec prédiction ML
+                        if hours < 24 and (deal.get('popularity_prediction') or deal.get('popularity_confidence')):
+                            filtered_results.append(deal)
+                
+                results = filtered_results
                 
                 if not results:
-                    st.info("Aucun nouveau deal prometteur trouvé pour cette recherche.")
+                    st.info("Aucun nouveau deal prometteur (< 24h) trouvé pour cette recherche.")
 
             # --- VÉRIFICATION DES RÉSULTATS ---
             if results:
@@ -248,8 +269,9 @@ def main():
                     # :orange[] colore le texte en orange
                     st.markdown(f"### :orange[{title}] — **{price}€**")
 
-                    # Si le deal est nouveau, on affiche la prédiction d'Arthur
-                    if deal.get('is_new'):
+                    # Si le deal a une prédiction ML, on l'affiche
+                    # (soit is_new=True, soit un deal < 24h avec prédiction en mode filtre)
+                    if deal.get('is_new') or (show_only_new and deal.get('popularity_confidence') is not None):
                         # Récupération de la confiance de la prédiction ML
                         conf = deal.get('popularity_confidence', 0)
                         
