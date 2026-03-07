@@ -248,8 +248,10 @@ def main():
                     # :orange[] colore le texte en orange
                     st.markdown(f"### :orange[{title}] — **{price}€**")
 
-                    # On vérifie si Arthur a marqué ce deal comme nouveau (is_new = True)
+                    # Si le deal est nouveau, on affiche la prédiction d'Arthur
                     if deal.get('is_new'):
+                        st.markdown(f"🏆 **Futur Top Deal :** {deal.get('popularity_prediction', 'N/A').upper()}")
+                        
                         # Récupération des données ML
                         pred = deal.get('popularity_prediction', 'N/A')
                         conf = deal.get('popularity_confidence', 0)
