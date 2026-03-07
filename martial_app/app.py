@@ -136,9 +136,13 @@ def main():
             # - Récupération des deals similaires
             results = get_deals_rag(query, selected_cat, max_p)
 
-            # Plus bas, lors du filtrage des résultats :
-            if show_only_new:
-                results = [d for d in results if d.get('is_new') == True]
+            # --- LOGIQUE DE FILTRAGE ML ---
+            if show_only_new and results:
+                # On ne garde que les deals où Arthur a mis is_new à True
+                results = [d for d in results if d.get('is_new') is True]
+                
+                if not results:
+                    st.info("Aucun nouveau deal prometteur trouvé pour cette recherche.")
 
             # --- VÉRIFICATION DES RÉSULTATS ---
             if results:
