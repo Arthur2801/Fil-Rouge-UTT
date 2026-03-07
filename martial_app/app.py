@@ -236,6 +236,16 @@ def main():
                     # :orange[] colore le texte en orange
                     st.markdown(f"### :orange[{title}] — **{price}€**")
 
+                    # On vérifie si Arthur a marqué ce deal comme nouveau (is_new = True)
+                    if deal.get('is_new'):
+                        # Récupération des données ML
+                        pred = deal.get('popularity_prediction', 'N/A')
+                        conf = deal.get('popularity_confidence', 0)
+                        
+                        # Affichage d'un bandeau spécial ML
+                        st.info(f"🔥 **Prédiction IA :** Ce deal est prédit **{pred.upper()}** "
+                                f"(Fiabilité : {round(conf * 100)}%)")
+
                     # --- MÉTADONNÉES EN COLONNES ---
                     # Création de 2 colonnes (ratio 2:1)
                     col1, col2 = st.columns([2, 1])

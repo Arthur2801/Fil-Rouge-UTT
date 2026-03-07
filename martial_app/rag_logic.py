@@ -411,4 +411,9 @@ def get_deals_rag(query, category_filter="Toutes", max_price=1200):
     # aggregate() exécute le pipeline et retourne un curseur
     # list() convertit le curseur en liste Python
     # Les résultats sont déjà triés par score décroissant
-    return list(collection.aggregate(pipeline))
+    results = list(collection.aggregate(pipeline))
+    
+    # On trie : les deals 'is_new' avec une prédiction 'chaud' remontent en haut
+    results.sort(key=lambda x: (x.get('is_new', False), x.get('popularity_confidence', 0)), reverse=True)
+    
+    return results
