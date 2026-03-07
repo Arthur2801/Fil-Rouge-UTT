@@ -193,7 +193,7 @@ def get_unique_categories():
     Récupère toutes les catégories de deals disponibles.
     
     Cette fonction interroge MongoDB pour obtenir toutes les valeurs uniques
-    du champ 'group_display_summary' (catégories), les filtre, les trie,
+    du champ 'main_group_name' (catégories), les filtre, les trie,
     et ajoute l'option "Toutes" en première position.
     
     Traitement:
@@ -223,8 +223,8 @@ def get_unique_categories():
         
         # --- EXTRACTION DES CATÉGORIES DISTINCTES ---
         # distinct() retourne toutes les valeurs uniques d'un champ
-        # Équivalent SQL: SELECT DISTINCT group_display_summary
-        categories = collection.distinct("group_display_summary")
+        # Équivalent SQL: SELECT DISTINCT main_group_name
+        categories = collection.distinct("main_group_name")
         
         # --- FILTRAGE DES VALEURS INVALIDES ---
         # Liste comprehension pour éliminer:
@@ -267,7 +267,7 @@ def get_deals_rag(query, category_filter="Toutes", max_price=1200):
         5. Retour des résultats triés par pertinence
     
     Technologie:
-        - Modèle: sentence-transformers/all-MiniLM-L6-v2 (384 dimensions)
+        - Modèle: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 (384 dimensions)
         - Index: MongoDB Atlas Search (index vectoriel)
         - Métrique: Similarité cosinus
         - Limite: 5 meilleurs résultats
@@ -289,7 +289,7 @@ def get_deals_rag(query, category_filter="Toutes", max_price=1200):
               Chaque dictionnaire contient:
               - title (str): Titre du deal
               - price (float): Prix en euros
-              - group_display_summary (str): Catégorie
+              - main_group_name (str): Catégorie
               - url (str): Lien vers le deal
               - text (str): Description complète
               - score (float): Score de pertinence (0 à 1)
@@ -299,7 +299,7 @@ def get_deals_rag(query, category_filter="Toutes", max_price=1200):
                   {
                       "title": "PC Gamer RTX 3060",
                       "price": 899.99,
-                      "group_display_summary": "High-Tech",
+                      "main_group_name": "High-Tech",
                       "url": "https://dealabs.com/...",
                       "text": "Description complète...",
                       "score": 0.87
@@ -335,7 +335,7 @@ def get_deals_rag(query, category_filter="Toutes", max_price=1200):
     # Configuration du modèle de sentence-transformers
     # Ce modèle convertit du texte en vecteurs de 384 dimensions
     # Les vecteurs similaires sémantiquement seront proches dans l'espace
-    model_name = "sentence-transformers/all-MiniLM-L6-v2"
+    model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     
     # Initialisation du modèle HuggingFace pour les embeddings
     # Cache automatiquement le modèle après le premier téléchargement
@@ -354,7 +354,7 @@ def get_deals_rag(query, category_filter="Toutes", max_price=1200):
     # Ajout conditionnel du filtre de catégorie
     # Si "Toutes" est sélectionné, pas de filtre de catégorie
     if category_filter != "Toutes":
-        search_filter["group_display_summary"] = category_filter
+        search_filter["main_group_name"] = category_filter
 
     # --- PHASE 3 : PIPELINE D'AGRÉGATION MONGODB ---
     # Construction du pipeline d'agrégation en 2 étapes
@@ -395,7 +395,7 @@ def get_deals_rag(query, category_filter="Toutes", max_price=1200):
             "$project": {
                 "title": 1,  # Titre du deal
                 "price": 1,  # Prix en euros
-                "group_display_summary": 1,  # Catégorie du deal
+                "main_group_name": 1,  # Catégorie du deal
                 "url": 1,  # Lien vers la page Dealabs
                 "text": 1,  # Description complète du deal
                 

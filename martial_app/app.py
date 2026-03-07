@@ -242,7 +242,7 @@ def main():
                     
                     # Colonne 1 : Catégorie du deal
                     with col1:
-                        category = deal.get('group_display_summary', 'N/A')
+                        category = deal.get('main_group_name', 'N/A')
                         st.caption(f" Catégorie : {category}")
                     
                     # Colonne 2 : Score de pertinence en pourcentage
