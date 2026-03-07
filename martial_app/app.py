@@ -261,20 +261,33 @@ def main():
                                 f"(Fiabilité : {round(conf * 100)}%)")
 
                     # --- MÉTADONNÉES EN COLONNES ---
-                    # Création de 2 colonnes (ratio 2:1)
-                    col1, col2 = st.columns([2, 1])
+                    # Création de 3 colonnes pour afficher les métadonnées
+                    col1, col2, col3 = st.columns(3)
                     
                     # Colonne 1 : Catégorie du deal
                     with col1:
                         category = deal.get('main_group_name', 'N/A')
-                        st.caption(f" Catégorie : {category}")
+                        st.caption(f"📁 Catégorie : {category}")
                     
-                    # Colonne 2 : Score de pertinence en pourcentage
+                    # Colonne 2 : Température (indicateur de pertinence visuel)
                     with col2:
+                        # Le score (0-1) est converti en température
+                        score = deal.get('score', 0)
+                        # Détermination de l'emoji selon le niveau de température
+                        if score >= 0.8:
+                            temp_icon = "🔥"  # Très chaud
+                        elif score >= 0.65:
+                            temp_icon = "🌡️"  # Chaud
+                        else:
+                            temp_icon = "❄️"  # Froid
+                        st.caption(f"{temp_icon} Température : {round(score * 100, 1)}%")
+                    
+                    # Colonne 3 : Score de pertinence en pourcentage
+                    with col3:
                         # Conversion du score (0-1) en pourcentage
                         # arrondi à 1 décimale
                         score_pct = round(deal.get('score', 0) * 100, 1)
-                        st.caption(f" Pertinence : {score_pct}%")
+                        st.caption(f"🎯 Pertinence : {score_pct}%")
 
                     # --- DESCRIPTION DÉTAILLÉE (EXPANDER) ---
                     # Vérification de la présence du champ 'text'
