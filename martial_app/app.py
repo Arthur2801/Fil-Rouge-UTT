@@ -76,13 +76,13 @@ def main():
     
     # Widget slider pour définir le budget maximum
     # min=0, max=10000, valeur par défaut=1200
-    # Widget slider pour définir le budget maximum
-    # min=0, max=10000, valeur par défaut=1200
     max_p = st.sidebar.slider("Budget maximum (€)", 0, 10000, 1200)
 
-    st.sidebar.divider()
+    # --- NOUVEAU : FILTRE POUR LES DEALS PRÉDITS PAR LE ML ---
+    st.sidebar.divider()  # Petite ligne de séparation
     st.sidebar.subheader("🔥 Mode Anticipation")
-    only_trending = st.sidebar.toggle("Nouveaux deals prometteurs uniquement")
+    # Ce toggle permet d'activer le filtre "Nouveaux deals prometteurs"
+    show_only_new = st.sidebar.toggle("Nouveaux deals prometteurs uniquement")
 
     # --- ZONE PRINCIPALE : TITRE ET BARRE DE RECHERCHE ---
     # Affichage du titre principal de l'application
@@ -137,7 +137,7 @@ def main():
             results = get_deals_rag(query, selected_cat, max_p)
 
             # Plus bas, lors du filtrage des résultats :
-            if only_trending:
+            if show_only_new:
                 results = [d for d in results if d.get('is_new') == True]
 
             # --- VÉRIFICATION DES RÉSULTATS ---
