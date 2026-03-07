@@ -398,6 +398,11 @@ def get_deals_rag(query, category_filter="Toutes", max_price=1200):
                 "main_group_name": 1,  # Catégorie du deal
                 "url": 1,  # Lien vers la page Dealabs
                 "text": 1,  # Description complète du deal
+                "temp": 1,  # Température Dealabs (en degrés)
+                "date": 1,  # Date de création du deal
+                "is_new": 1,  # Deal marqué comme nouveau
+                "popularity_prediction": 1,  # Prédiction ML
+                "popularity_confidence": 1,  # Confiance de la prédiction
                 
                 # Score de similarité vectorielle (métadonnée spéciale)
                 # $meta "vectorSearchScore" retourne le score de 0 à 1

@@ -261,29 +261,64 @@ def main():
                                 f"(Fiabilité : {round(conf * 100)}%)")
 
                     # --- MÉTADONNÉES EN COLONNES ---
-                    # Création de 3 colonnes pour afficher les métadonnées
-                    col1, col2, col3 = st.columns(3)
+                    # Création de 4 colonnes pour afficher les métadonnées
+                    col1, col2, col3, col4 = st.columns(4)
                     
                     # Colonne 1 : Catégorie du deal
                     with col1:
                         category = deal.get('main_group_name', 'N/A')
                         st.caption(f"📁 Catégorie : {category}")
                     
-                    # Colonne 2 : Température (indicateur de pertinence visuel)
+                    # Colonne 2 : Température Dealabs (en degrés)
                     with col2:
-                        # Le score (0-1) est converti en température
-                        score = deal.get('score', 0)
-                        # Détermination de l'emoji selon le niveau de température
-                        if score >= 0.8:
+                        # Récupération de la température Dealabs
+                        temp_dealabs = deal.get('temp', 0)
+                        if temp_dealabs >= 100:
                             temp_icon = "🔥"  # Très chaud
-                        elif score >= 0.65:
+                        elif temp_dealabs >= 50:
                             temp_icon = "🌡️"  # Chaud
                         else:
                             temp_icon = "❄️"  # Froid
-                        st.caption(f"{temp_icon} Température : {round(score * 100, 1)}%")
+                        st.caption(f"{temp_icon} Température : {temp_dealabs}°")
                     
-                    # Colonne 3 : Score de pertinence en pourcentage
+                    # Colonne 3 : Durée depuis la publication
                     with col3:
+                        from datetime import datetime, timezone
+                        deal_date = deal.get('date')
+                        if deal_date:
+                            # Si la date est un timestamp Unix
+                            if isinstance(deal_date, (int, float)):
+                                deal_datetime = datetime.fromtimestamp(deal_date, tz=timezone.utc)
+                            else:
+                                # Si la date est déjà un objet datetime
+                                deal_datetime = deal_date
+                            
+                            # Calcul de la durée
+                            now = datetime.now(timezone.utc)
+                            delta = now - deal_datetime
+                            hours = delta.total_seconds() / 3600
+                            
+                            if hours < 24:
+                                # Affichage en heures
+                                duration = f"{int(hours)}h"
+                            elif hours < 24 * 7:
+                                # Affichage en jours
+                                days = int(hours / 24)
+                                duration = f"{days}j"
+                            elif hours < 24 * 30:
+                                # Affichage en semaines
+                                weeks = int(hours / (24 * 7))
+                                duration = f"{weeks}sem"
+                            else:
+                                # Affichage en mois
+                                months = int(hours / (24 * 30))
+                                duration = f"{months}mois"
+                            st.caption(f"⏱️ Durée : {duration}")
+                        else:
+                            st.caption("⏱️ Durée : N/A")
+                    
+                    # Colonne 4 : Score de pertinence en pourcentage
+                    with col4:
                         # Conversion du score (0-1) en pourcentage
                         # arrondi à 1 décimale
                         score_pct = round(deal.get('score', 0) * 100, 1)
