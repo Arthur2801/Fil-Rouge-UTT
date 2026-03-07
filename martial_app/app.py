@@ -80,6 +80,10 @@ def main():
     # min=0, max=10000, valeur par défaut=1200
     max_p = st.sidebar.slider("Budget maximum (€)", 0, 10000, 1200)
 
+    st.sidebar.divider()
+    st.sidebar.subheader("🔥 Mode Anticipation")
+    only_trending = st.sidebar.toggle("Nouveaux deals prometteurs uniquement")
+
     # --- ZONE PRINCIPALE : TITRE ET BARRE DE RECHERCHE ---
     # Affichage du titre principal de l'application
     st.title("Assistant Intelligent Dealabs 🤖")
@@ -131,6 +135,10 @@ def main():
             # - Recherche dans MongoDB Atlas
             # - Récupération des deals similaires
             results = get_deals_rag(query, selected_cat, max_p)
+
+            # Plus bas, lors du filtrage des résultats :
+            if only_trending:
+                results = [d for d in results if d.get('is_new') == True]
 
             # --- VÉRIFICATION DES RÉSULTATS ---
             if results:
