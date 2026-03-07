@@ -418,7 +418,10 @@ def get_deals_rag(query, category_filter="Toutes", max_price=1200):
     # Les résultats sont déjà triés par score décroissant
     results = list(collection.aggregate(pipeline))
     
-    # On trie : les deals 'is_new' avec une prédiction 'chaud' remontent en haut
+    # Tri pour faire remonter les deals prometteurs :
+    # - is_new = True (nouveaux deals)
+    # - popularity_confidence >= 0.5 (prédiction "CHAUD")
+    # Les deals "CHAUD" (conf >= 0.5) remontent avant les "FROID" (conf < 0.5)
     results.sort(key=lambda x: (x.get('is_new', False), x.get('popularity_confidence', 0)), reverse=True)
     
     return results

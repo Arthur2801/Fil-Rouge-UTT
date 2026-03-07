@@ -250,14 +250,22 @@ def main():
 
                     # Si le deal est nouveau, on affiche la prédiction d'Arthur
                     if deal.get('is_new'):
-                        st.markdown(f"🏆 **Futur Top Deal :** {deal.get('popularity_prediction', 'N/A').upper()}")
-                        
-                        # Récupération des données ML
-                        pred = deal.get('popularity_prediction', 'N/A')
+                        # Récupération de la confiance de la prédiction ML
                         conf = deal.get('popularity_confidence', 0)
                         
+                        # Détermination de la prédiction selon le seuil de 0.5
+                        if conf >= 0.5:
+                            pred = "CHAUD"
+                            pred_icon = "🔥"
+                        else:
+                            pred = "FROID"
+                            pred_icon = "❄️"
+                        
+                        # Affichage du badge Futur Top Deal
+                        st.markdown(f"🏆 **Futur Top Deal :** {pred_icon} {pred}")
+                        
                         # Affichage d'un bandeau spécial ML
-                        st.info(f"🔥 **Prédiction IA :** Ce deal est prédit **{pred.upper()}** "
+                        st.info(f"{pred_icon} **Prédiction IA :** Ce deal est prédit **{pred}** "
                                 f"(Fiabilité : {round(conf * 100)}%)")
 
                     # --- MÉTADONNÉES EN COLONNES ---
