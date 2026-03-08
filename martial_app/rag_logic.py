@@ -248,7 +248,7 @@ def get_unique_categories():
         return ["Toutes", "High-Tech", "Consoles", "Jeux Vidéo"]
 
 
-def get_deals_rag(query, category_filter="Toutes", max_price=1200):
+def get_deals_rag(query, max_price=1200):
     """
     Effectue une recherche vectorielle hybride sur les deals Dealabs.
     
@@ -276,10 +276,6 @@ def get_deals_rag(query, category_filter="Toutes", max_price=1200):
         query (str): La requête de recherche en langage naturel de
                     l'utilisateur.
                     Exemple: "ordinateur portable pour jouer"
-        
-        category_filter (str, optional): Filtre de catégorie à appliquer.
-                                        Défaut: "Toutes" (pas de filtre).
-                                        Exemples: "High-Tech", "Consoles"
         
         max_price (int, optional): Prix maximum en euros pour filtrer les
                                    deals. Défaut: 1200.
@@ -317,10 +313,9 @@ def get_deals_rag(query, category_filter="Toutes", max_price=1200):
         >>> results = get_deals_rag("smartphone")
         >>> print(f"Trouvé {len(results)} deals")
         
-        >>> # Recherche avec filtres
+        >>> # Recherche avec filtre de prix
         >>> results = get_deals_rag(
         ...     query="ordinateur portable",
-        ...     category_filter="High-Tech",
         ...     max_price=1000
         ... )
         >>> for deal in results:
@@ -350,11 +345,6 @@ def get_deals_rag(query, category_filter="Toutes", max_price=1200):
     # Initialisation du dictionnaire de filtres avec le prix maximum
     # $lte = "less than or equal" (inférieur ou égal)
     search_filter = {"price": {"$lte": max_price}}
-    
-    # Ajout conditionnel du filtre de catégorie
-    # Si "Toutes" est sélectionné, pas de filtre de catégorie
-    if category_filter != "Toutes":
-        search_filter["main_group_name"] = category_filter
 
     # --- PHASE 3 : PIPELINE D'AGRÉGATION MONGODB ---
     # Construction du pipeline d'agrégation en 2 étapes

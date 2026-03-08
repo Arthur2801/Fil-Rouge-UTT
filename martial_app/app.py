@@ -23,7 +23,6 @@ from PIL import Image
 # Imports locaux depuis le module rag_logic
 from rag_logic import (
     get_deals_rag,
-    get_unique_categories,
     get_llm_answer
 )
 
@@ -67,13 +66,6 @@ def main():
         st.sidebar.error("Fichier logo introuvable sur le serveur.")
 
     # --- INTERFACE DE FILTRAGE (SIDEBAR) ---
-    # Récupération de toutes les catégories disponibles depuis MongoDB
-    categories = get_unique_categories()
-    
-    # Widget de sélection déroulante pour choisir une catégorie
-    # Permet de filtrer les deals par type (High-Tech, Jeux, etc.)
-    selected_cat = st.sidebar.selectbox("Choisir un groupe", categories)
-    
     # Widget slider pour définir le budget maximum
     # min=0, max=10000, valeur par défaut=1200
     max_p = st.sidebar.slider("Budget maximum (€)", 0, 10000, 1200)
@@ -134,12 +126,12 @@ def main():
             # - Vectorisation de la requête
             # - Recherche dans MongoDB Atlas
             # - Récupération des deals similaires
-            results = get_deals_rag(query, selected_cat, max_p)
+            results = get_deals_rag(query, max_p)
 
             # --- LOGIQUE DE FILTRAGE ML ---
             if show_only_new and results:
                 from datetime import datetime, timezone
-                # Filtrer uniquement les deals avec durée < 24h
+                # Filtrer uniquement les deals avec durée < 5h (nouveaux deals)
                 filtered_results = []
                 now = datetime.now(timezone.utc)
                 
@@ -156,14 +148,14 @@ def main():
                         delta = now - deal_datetime
                         hours = delta.total_seconds() / 3600
                         
-                        # Ne garder que les deals < 24h avec prédiction ML
-                        if hours < 24 and (deal.get('popularity_prediction') or deal.get('popularity_confidence')):
+                        # Ne garder que les deals < 5h avec prédiction ML
+                        if hours < 5 and (deal.get('popularity_prediction') or deal.get('popularity_confidence')):
                             filtered_results.append(deal)
                 
                 results = filtered_results
                 
                 if not results:
-                    st.info("Aucun nouveau deal prometteur (< 24h) trouvé pour cette recherche.")
+                    st.info("Aucun nouveau deal prometteur (< 5h) trouvé pour cette recherche.")
 
             # --- VÉRIFICATION DES RÉSULTATS ---
             if results:
@@ -291,16 +283,11 @@ def main():
                                 f"(Fiabilité : {round(conf * 100)}%)")
 
                     # --- MÉTADONNÉES EN COLONNES ---
-                    # Création de 4 colonnes pour afficher les métadonnées
-                    col1, col2, col3, col4 = st.columns(4)
+                    # Création de 3 colonnes pour afficher les métadonnées
+                    col1, col2, col3 = st.columns(3)
                     
-                    # Colonne 1 : Catégorie du deal
+                    # Colonne 1 : Température Dealabs (en degrés)
                     with col1:
-                        category = deal.get('main_group_name', 'N/A')
-                        st.caption(f"📁 Catégorie : {category}")
-                    
-                    # Colonne 2 : Température Dealabs (en degrés)
-                    with col2:
                         # Récupération de la température Dealabs
                         temp_dealabs = deal.get('temp', 0)
                         if temp_dealabs >= 100:
@@ -311,8 +298,8 @@ def main():
                             temp_icon = "❄️"  # Froid
                         st.caption(f"{temp_icon} Température : {temp_dealabs}°")
                     
-                    # Colonne 3 : Durée depuis la publication
-                    with col3:
+                    # Colonne 2 : Durée depuis la publication
+                    with col2:
                         from datetime import datetime, timezone
                         deal_date = deal.get('date')
                         if deal_date:
@@ -347,8 +334,8 @@ def main():
                         else:
                             st.caption("⏱️ Durée : N/A")
                     
-                    # Colonne 4 : Score de pertinence en pourcentage
-                    with col4:
+                    # Colonne 3 : Score de pertinence en pourcentage
+                    with col3:
                         # Conversion du score (0-1) en pourcentage
                         # arrondi à 1 décimale
                         score_pct = round(deal.get('score', 0) * 100, 1)
