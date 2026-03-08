@@ -136,13 +136,10 @@ def main():
                 now = datetime.now(timezone.utc)
                 
                 for deal in results:
-                    deal_date = deal.get('date')
-                    if deal_date:
-                        # Conversion de la date
-                        if isinstance(deal_date, (int, float)):
-                            deal_datetime = datetime.fromtimestamp(deal_date, tz=timezone.utc)
-                        else:
-                            deal_datetime = deal_date
+                    deal_timestamp = deal.get('submitted')
+                    if deal_timestamp:
+                        # Conversion du timestamp Unix en datetime
+                        deal_datetime = datetime.fromtimestamp(deal_timestamp, tz=timezone.utc)
                         
                         # Calcul de la durée en heures
                         delta = now - deal_datetime
@@ -301,14 +298,10 @@ def main():
                     # Colonne 2 : Durée depuis la publication
                     with col2:
                         from datetime import datetime, timezone
-                        deal_date = deal.get('date')
-                        if deal_date:
-                            # Si la date est un timestamp Unix
-                            if isinstance(deal_date, (int, float)):
-                                deal_datetime = datetime.fromtimestamp(deal_date, tz=timezone.utc)
-                            else:
-                                # Si la date est déjà un objet datetime
-                                deal_datetime = deal_date
+                        deal_timestamp = deal.get('submitted')
+                        if deal_timestamp:
+                            # Conversion du timestamp Unix en datetime
+                            deal_datetime = datetime.fromtimestamp(deal_timestamp, tz=timezone.utc)
                             
                             # Calcul de la durée
                             now = datetime.now(timezone.utc)
