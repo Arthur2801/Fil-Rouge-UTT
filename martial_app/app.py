@@ -133,6 +133,9 @@ def main():
                 # Filtrer uniquement les deals avec is_new = True (nouveaux deals prometteurs)
                 results = [deal for deal in results if deal.get('is_new') is True]
                 
+                # Limiter à 5 deals maximum en mode anticipation
+                results = results[:5]
+                
                 if not results:
                     st.info("Aucun nouveau deal prometteur trouvé pour cette recherche.")
 
@@ -214,6 +217,38 @@ def main():
                 # --- AFFICHAGE DÉTAILLÉ DES RÉSULTATS ---
                 # Sélection des deals à afficher (pertinents ou tous)
                 deals_to_display = relevant_deals if has_relevant else results
+                
+                # --- ENCART ANALYSE PRÉDICTIVE IA (MODE ANTICIPATION) ---
+                if show_only_new and deals_to_display:
+                    st.subheader("🤖 Analyse Prédictive IA")
+                    
+                    # Conteneur pour l'analyse prédictive globale
+                    with st.container():
+                        # Affichage des prédictions pour chaque deal
+                        for idx, deal in enumerate(deals_to_display, 1):
+                            confidence = deal.get('popularity_confidence', 0)
+                            prediction = deal.get('popularity_prediction', 'N/A')
+                            title = deal.get('title', 'Sans titre')
+                            
+                            # Conversion de la confiance en pourcentage
+                            confidence_pct = round(confidence * 100, 1)
+                            
+                            # Badge de couleur selon la prédiction
+                            if confidence >= 0.5:
+                                badge_color = "🔥"
+                                pred_text = "CHAUD"
+                            else:
+                                badge_color = "❄️"
+                                pred_text = "FROID"
+                            
+                            # Affichage de l'analyse pour ce deal
+                            st.info(
+                                f"**Deal #{idx}** : {title[:50]}...\n\n"
+                                f"{badge_color} **Potentiel : {pred_text}** | "
+                                f"**Fiabilité : {confidence_pct}%**"
+                            )
+                    
+                    st.divider()
                 
                 # En-tête conditionnel selon le type de deals affichés
                 if has_relevant:
