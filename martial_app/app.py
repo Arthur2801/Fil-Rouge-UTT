@@ -405,8 +405,23 @@ def main():
                             with st.expander(t["view_details"]):
                                 # Nettoyage du texte : ajout de sauts de ligne
                                 # après chaque point pour améliorer la lisibilité
-                                clean_text = deal["text"].replace(". ", ".\n\n")
-                                st.write(clean_text)
+                                clean_text = deal["text"].replace(". ", ".  \n")
+                                
+                                # Affichage du texte avec justification et mise en forme
+                                st.markdown(
+                                    f"""
+                                    <div style="
+                                        text-align: justify;
+                                        text-justify: inter-word;
+                                        line-height: 1.8;
+                                        font-size: 15px;
+                                        padding: 10px 0;
+                                    ">
+                                        {clean_text}
+                                    </div>
+                                    """,
+                                    unsafe_allow_html=True
+                                )
 
                         # --- BOUTON D'ACTION ---
                         # Vérification de la présence et validité de l'URL
