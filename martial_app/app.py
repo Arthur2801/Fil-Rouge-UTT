@@ -303,10 +303,10 @@ def main():
                     with col2:
                         is_new = deal.get('is_new', False)
                         if is_new:
-                            status_circle = "🟢"  # Cercle vert plein
+                            #status_circle = "🟢"  # Cercle vert plein
                             status_text = "Nouveau"
                         else:
-                            status_circle = "⚪"  # Cercle gris transparent
+                           # status_circle = "⚪"  # Cercle gris transparent
                             status_text = "Ancien"
                         st.caption(f"Statut : {status_text} {status_circle}")
                     
