@@ -45,10 +45,13 @@ def get_llm_answer(query, context_documents):
     
     Cette fonction prend une requête utilisateur et des documents de contexte
     (deals trouvés), puis utilise un modèle de langage pour générer une
-    réponse pertinente et comparative dans la langue de la question.
+    réponse pertinente et comparative.
     
-    Le LLM détecte automatiquement la langue de la question et répond
-    dans cette même langue, quelle que soit la langue du navigateur.
+    Détection de langue intelligente :
+    - Par défaut : le chatbot répond en FRANÇAIS
+    - Si la question est bien formulée dans une autre langue (anglais/espagnol)
+      avec au moins 3 mots-clés spécifiques et au moins 4 mots au total,
+      alors le chatbot répond dans cette langue
     
     Args:
         query (str): La question/requête de l'utilisateur.
@@ -84,30 +87,42 @@ def get_llm_answer(query, context_documents):
     api_key = os.getenv("GROQ_API_KEY")
 
     # --- DÉTECTION DE LA LANGUE DE LA QUESTION ---
-    # Détection simple basée sur des mots-clés courants
+    # Détection avec seuil de confiance : le français est privilégié par défaut
+    # La langue est changée seulement si la question est "bien formulée" dans une autre langue
     query_lower = query.lower()
+    query_words = query_lower.split()
     
     # Mots-clés anglais courants
     english_keywords = ['the', 'for', 'looking', 'find', 'want', 'need', 'buy', 'search', 
                        'best', 'good', 'cheap', 'price', 'deal', 'where', 'how', 'what',
-                       'laptop', 'phone', 'gaming', 'pc', 'computer', 'i\'m', 'i am']
+                       'laptop', 'phone', 'gaming', 'pc', 'computer', 'i\'m', 'i am', 'can',
+                       'you', 'please', 'help', 'show', 'give', 'is', 'are', 'looking for']
     
     # Mots-clés espagnols courants
     spanish_keywords = ['el', 'la', 'los', 'para', 'busco', 'quiero', 'necesito', 
-                       'mejor', 'bueno', 'barato', 'precio', 'donde', 'como', 'qué']
+                       'mejor', 'bueno', 'barato', 'precio', 'donde', 'como', 'qué',
+                       'dame', 'ayuda', 'por favor', 'estoy buscando']
     
     # Comptage des correspondances
     english_count = sum(1 for kw in english_keywords if kw in query_lower)
     spanish_count = sum(1 for kw in spanish_keywords if kw in query_lower)
     
-    # Détermination de la langue
-    if english_count > 0 and english_count >= spanish_count:
+    # Seuil de confiance : au moins 3 mots-clés ET au moins 4 mots au total
+    # pour être considéré comme "bien formulé"
+    MIN_KEYWORDS = 3
+    MIN_WORDS = 4
+    
+    is_well_formed = len(query_words) >= MIN_WORDS
+    
+    # Détermination de la langue avec privilège pour le français
+    if is_well_formed and english_count >= MIN_KEYWORDS and english_count > spanish_count:
         detected_lang = "en"
         lang_instruction = "YOU MUST RESPOND IN ENGLISH. Answer the following question in English only."
-    elif spanish_count > 0:
+    elif is_well_formed and spanish_count >= MIN_KEYWORDS and spanish_count > english_count:
         detected_lang = "es"
         lang_instruction = "DEBES RESPONDER EN ESPAÑOL. Responde la siguiente pregunta solo en español."
     else:
+        # Par défaut : français (si pas assez de mots-clés ou question courte)
         detected_lang = "fr"
         lang_instruction = "TU DOIS RÉPONDRE EN FRANÇAIS. Réponds à la question suivante uniquement en français."
 
