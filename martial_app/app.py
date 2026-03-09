@@ -300,26 +300,20 @@ def main():
                     # Création de 3 colonnes pour afficher les métadonnées
                     col1, col2, col3 = st.columns(3)
                     
-                    # Colonne 1 : Niveau de température du deal
+                    # Colonne 1 : Température du deal (en degrés Celsius)
                     with col1:
-                        # Récupération du niveau de température depuis temperature_level
-                        temp_level = deal.get('temperature_level', 'N/A')
+                        # Récupération de la température depuis temperature_rating
+                        temp_rating = deal.get('temperature_rating', 0)
                         
-                        # Détermination de l'icône selon le niveau
-                        if temp_level and isinstance(temp_level, str):
-                            temp_lower = temp_level.lower()
-                            if 'hot' in temp_lower or 'chaud' in temp_lower:
-                                temp_icon = "🔥"
-                            elif 'warm' in temp_lower or 'tiède' in temp_lower:
-                                temp_icon = "🌡️"
-                            elif 'cold' in temp_lower or 'froid' in temp_lower:
-                                temp_icon = "❄️"
-                            else:
-                                temp_icon = "📊"
+                        # Détermination de l'icône selon la température
+                        if temp_rating >= 100:
+                            temp_icon = "🔥"
+                        elif temp_rating >= 50:
+                            temp_icon = "🌡️"
                         else:
-                            temp_icon = "📊"
+                            temp_icon = "❄️"
                         
-                        st.caption(f"{temp_icon} Température : {temp_level}")
+                        st.caption(f"{temp_icon} Température : {temp_rating}°C")
                     
                     # Colonne 2 : Statut du deal (Nouveau/Ancien)
                     with col2:
