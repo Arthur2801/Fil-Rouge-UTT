@@ -271,7 +271,7 @@ def get_llm_answer(query, context_documents):
             pred = doc.get("popularity_prediction")
             conf = doc.get("popularity_confidence", 0)
             # Utilisation de la nomenclature: 🔥 CHAUD, ❄️ FROID
-            pred_display = "🔥 CHAUD" if pred == "CHAUD" else "❄️ FROID"
+            pred_display = "🔥 CHAUD" if str(pred).upper() == "CHAUD" else "❄️ FROID"
             deal_info += f"Prédiction ML: {pred_display} (Fiabilité: {round(conf * 100)}%)\n"
 
         # Ajout du sentiment social si disponible
