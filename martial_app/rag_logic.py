@@ -394,6 +394,7 @@ def get_deals_rag(query, max_price=1200):
                 "is_new": 1,  # Deal marqué comme nouveau
                 "popularity_prediction": 1,  # Prédiction ML
                 "popularity_confidence": 1,  # Confiance de la prédiction
+                "comments_sentiment_score": 1,  # Score de sentiment de la communauté (1-5)
                 
                 # Score de similarité vectorielle (métadonnée spéciale)
                 # $meta "vectorSearchScore" retourne le score de 0 à 1

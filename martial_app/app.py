@@ -336,6 +336,34 @@ def main():
                         score_pct = round(deal.get('score', 0) * 100, 1)
                         st.caption(f"🎯 Pertinence : {score_pct}%")
 
+                    # --- AVIS COMMUNAUTÉ ---
+                    # Affichage du sentiment de la communauté basé sur les commentaires
+                    sentiment_score = deal.get('comments_sentiment_score')
+                    if sentiment_score is not None:
+                        # Conversion du score en qualification et étoiles
+                        if sentiment_score >= 4.5:
+                            qualification = "Excellent"
+                            stars = "⭐⭐⭐⭐⭐"
+                        elif sentiment_score >= 3.5:
+                            qualification = "Très bien"
+                            stars = "⭐⭐⭐⭐"
+                        elif sentiment_score >= 2.5:
+                            qualification = "Bien"
+                            stars = "⭐⭐⭐"
+                        elif sentiment_score >= 1.5:
+                            qualification = "Moyen"
+                            stars = "⭐⭐"
+                        else:
+                            qualification = "Faible"
+                            stars = "⭐"
+                        
+                        # Affichage avec un bandeau coloré
+                        st.markdown(f"**💬 Avis communauté :** {qualification} {stars}")
+                        st.caption(f"Score sentiment : {round(sentiment_score, 1)}/5")
+                    else:
+                        # Aucun avis disponible
+                        st.markdown(f"**💬 Avis communauté :** Pas encore d'avis")
+
                     # --- DESCRIPTION DÉTAILLÉE (EXPANDER) ---
                     # Vérification de la présence du champ 'text'
                     if "text" in deal:
