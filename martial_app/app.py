@@ -22,11 +22,7 @@ import streamlit.components.v1 as components
 from PIL import Image
 
 # Imports locaux depuis le module rag_logic
-from rag_logic import (
-    get_deals_rag,
-    get_llm_answer,
-    detect_language
-)
+from rag_logic import get_deals_rag, get_llm_answer, detect_language
 
 # Import du module de traduction
 from i18n import get_all_translations
@@ -35,14 +31,14 @@ from i18n import get_all_translations
 def detect_browser_language():
     """
     Détecte la langue du navigateur de l'utilisateur via JavaScript.
-    
+
     Returns:
         str: Code langue détecté (fr, en, es, etc.)
     """
     # Si la langue est déjà détectée dans session_state, on la retourne
-    if 'browser_lang' in st.session_state and st.session_state.browser_lang:
+    if "browser_lang" in st.session_state and st.session_state.browser_lang:
         return st.session_state.browser_lang
-    
+
     # Script JavaScript pour détecter la langue du navigateur
     js_code = """
     <script>
@@ -68,30 +64,30 @@ def detect_browser_language():
         }
     </script>
     """
-    
+
     # Exécution du JavaScript
     components.html(js_code, height=0)
-    
+
     # Récupération du paramètre lang de l'URL
     query_params = st.query_params
-    detected_lang = query_params.get('lang', 'fr')
-    
+    detected_lang = query_params.get("lang", "fr")
+
     # Stockage dans session_state
     st.session_state.browser_lang = detected_lang
-    
+
     return detected_lang
 
 
 def main():
     """
     Fonction principale de l'application Streamlit.
-    
+
     Cette fonction orchestre toute la logique de l'application :
     1. Configuration de la page et affichage du logo
     2. Gestion des filtres (catégorie, prix)
     3. Gestion du formulaire de recherche
     4. Traitement des résultats et affichage
-    
+
     Returns:
         None
     """
@@ -100,7 +96,7 @@ def main():
     st.set_page_config(
         page_title="Dealabs Smart Search",  # Titre dans l'onglet du navigateur
         page_icon="🔥",  # Icône dans l'onglet du navigateur
-        layout="wide"  # Mode large pour plus d'espace horizontal
+        layout="wide",  # Mode large pour plus d'espace horizontal
     )
 
     # --- DÉTECTION AUTOMATIQUE DE LA LANGUE DU NAVIGATEUR ---
@@ -109,7 +105,7 @@ def main():
     # --- GESTION DU LOGO DANS LA SIDEBAR ---
     # Récupération du chemin absolu du répertoire courant
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    
+
     # Construction du chemin complet vers le fichier logo
     logo_path = os.path.join(current_dir, "notre_logo.png")
 
@@ -117,7 +113,7 @@ def main():
     if os.path.exists(logo_path):
         # Chargement de l'image avec PIL (Python Imaging Library)
         logo = Image.open(logo_path)
-        
+
         # Affichage dans la sidebar avec largeur adaptative
         st.sidebar.image(logo, width="stretch")
     else:
@@ -138,13 +134,13 @@ def main():
     # --- ZONE PRINCIPALE : TITRE ET BARRE DE RECHERCHE ---
     # Affichage du titre principal de l'application
     st.title("Assistant Intelligent Dealabs 🤖")
-    
+
     # --- GESTION DE L'ÉTAT DU FORMULAIRE ---
     # Initialisation de session_state pour persister les données entre reloads
     # session_state permet de conserver l'état de l'application
-    if 'query_submitted' not in st.session_state:
+    if "query_submitted" not in st.session_state:
         st.session_state.query_submitted = False
-    
+
     # --- FORMULAIRE DE RECHERCHE ---
     # Utilisation d'un formulaire Streamlit avec clear_on_submit=True
     # Cela permet de vider automatiquement le champ après soumission
@@ -153,26 +149,25 @@ def main():
         query = st.text_input(
             "Que cherchez-vous ?",  # Label du champ
             placeholder="ex: ordinateur pour jouer",  # Texte d'exemple
-            key="search_input"  # Clé unique pour ce widget
+            key="search_input",  # Clé unique pour ce widget
         )
-        
+
         # Bouton de soumission du formulaire avec icône de recherche
         submit_button = st.form_submit_button("🔍 Rechercher")
-    
+
     # --- TRAITEMENT DE LA SOUMISSION ---
     # Vérification que le formulaire a été soumis ET qu'une requête existe
     if submit_button and query:
         # Sauvegarde de la requête dans session_state pour la persister
         st.session_state.last_query = query
-        
+
         # Activation du flag indiquant qu'une recherche a été effectuée
         st.session_state.query_submitted = True
-    
+
     # --- RÉCUPÉRATION DE LA DERNIÈRE REQUÊTE ---
     # Si une recherche a été effectuée, récupérer la dernière requête
     # Cela permet de maintenir les résultats même après rechargement
-    if (st.session_state.get('query_submitted', False) and
-            st.session_state.get('last_query')):
+    if st.session_state.get("query_submitted", False) and st.session_state.get("last_query"):
         query = st.session_state.last_query
 
     # --- TRAITEMENT DE LA RECHERCHE ---
@@ -182,14 +177,16 @@ def main():
         # Détection de la langue de la requête pour adapter l'interface
         detected_lang = detect_language(query)
         st.session_state.current_lang = detected_lang
-        
+
         # Chargement des traductions pour la langue détectée
         t = get_all_translations(detected_lang)
-        
+
         # Affichage d'un spinner pendant la recherche vectorielle
-        with st.spinner("Recherche sémantique..." if detected_lang == "fr" 
-                       else "Semantic search..." if detected_lang == "en"
-                       else "Búsqueda semántica..."):
+        with st.spinner(
+            "Recherche sémantique..."
+            if detected_lang == "fr"
+            else ("Semantic search..." if detected_lang == "en" else "Búsqueda semántica...")
+        ):
             # Appel de la fonction RAG pour rechercher les deals
             # Étapes 4 à 6 du processus RAG :
             # - Vectorisation de la requête
@@ -200,11 +197,11 @@ def main():
             # --- LOGIQUE DE FILTRAGE ML ---
             if show_only_new and results:
                 # Filtrer uniquement les deals avec is_new = True (nouveaux deals prometteurs)
-                results = [deal for deal in results if deal.get('is_new') is True]
-                
+                results = [deal for deal in results if deal.get("is_new") is True]
+
                 # Limiter à 5 deals maximum en mode anticipation
                 results = results[:5]
-                
+
                 if not results:
                     st.info("Aucun nouveau deal prometteur trouvé pour cette recherche.")
 
@@ -215,41 +212,37 @@ def main():
                 # Les deals au-dessus de ce seuil sont considérés pertinents
                 # Les deals en-dessous sont des suggestions alternatives
                 PERTINENCE_THRESHOLD = 0.65
-                
+
                 # Séparation des deals en deux catégories selon leur score
                 # Liste comprehension pour filtrer les deals pertinents
                 relevant_deals = [
-                    deal for deal in results
-                    if deal.get('score', 0) >= PERTINENCE_THRESHOLD
+                    deal for deal in results if deal.get("score", 0) >= PERTINENCE_THRESHOLD
                 ]
-                
+
                 # Liste comprehension pour filtrer les deals similaires
                 similar_deals = [
-                    deal for deal in results
-                    if deal.get('score', 0) < PERTINENCE_THRESHOLD
+                    deal for deal in results if deal.get("score", 0) < PERTINENCE_THRESHOLD
                 ]
-                
+
                 # Flag booléen : True si au moins un deal pertinent existe
                 # Flag booléen : True si au moins un deal pertinent existe
                 has_relevant = len(relevant_deals) > 0
-                
+
                 # --- SECTION ANALYSE CHATBOT (LLM) ---
                 # Affichage conditionnel selon la pertinence des résultats
                 if has_relevant:
                     # Cas 1 : Des deals pertinents ont été trouvés
                     st.subheader(t["assistant_analysis"])
-                    
+
                     # Message informatif avec le nombre de deals pertinents
-                    st.info(
-                        f"**{len(relevant_deals)} {t['deals_found']}**"
-                    )
+                    st.info(f"**{len(relevant_deals)} {t['deals_found']}**")
                 else:
                     # Cas 2 : Aucun deal pertinent, seulement des suggestions
                     st.subheader(t["alternative_suggestions"])
-                    
+
                     # Message d'avertissement expliquant la situation
                     st.warning(t["no_exact_deal"])
-                
+
                 # --- GÉNÉRATION DE LA RÉPONSE LLM ---
                 # Spinner pendant l'analyse par le modèle de langage
                 with st.spinner(t["analyzing"]):
@@ -257,10 +250,8 @@ def main():
                         # Sélection des deals à analyser par le LLM
                         # Si pertinents trouvés : uniquement ceux-ci
                         # Sinon : tous les résultats (suggestions)
-                        deals_to_analyze = (
-                            relevant_deals if has_relevant else results
-                        )
-                        
+                        deals_to_analyze = relevant_deals if has_relevant else results
+
                         # Étapes 7 à 9 du processus RAG :
                         # - Construction du prompt avec contexte
                         # - Envoi au LLM (GROQ)
@@ -268,11 +259,11 @@ def main():
                         # Le LLM détecte automatiquement la langue de la question
                         answer = get_llm_answer(query, deals_to_analyze)
                         st.write(answer)
-                        
+
                     except Exception as e:
                         # Gestion des erreurs lors de l'appel au LLM
                         st.error(f"{t['error_llm']} {e}")
-                
+
                 # Ligne de séparation visuelle entre sections
                 # Ligne de séparation visuelle entre sections
                 st.divider()
@@ -280,22 +271,22 @@ def main():
                 # --- AFFICHAGE DÉTAILLÉ DES RÉSULTATS ---
                 # Sélection des deals à afficher (pertinents ou tous)
                 deals_to_display = relevant_deals if has_relevant else results
-                
+
                 # --- ENCART ANALYSE PRÉDICTIVE IA (MODE ANTICIPATION) ---
                 if show_only_new and deals_to_display:
                     st.subheader(t["predictive_analysis"])
-                    
+
                     # Conteneur pour l'analyse prédictive globale
                     with st.container():
                         # Affichage des prédictions pour chaque deal
                         for idx, deal in enumerate(deals_to_display, 1):
-                            confidence = deal.get('popularity_confidence', 0)
-                            prediction = deal.get('popularity_prediction', 'N/A')
-                            title = deal.get('title', 'Sans titre')
-                            
+                            confidence = deal.get("popularity_confidence", 0)
+                            prediction = deal.get("popularity_prediction", "N/A")
+                            title = deal.get("title", "Sans titre")
+
                             # Conversion de la confiance en pourcentage
                             confidence_pct = round(confidence * 100, 1)
-                            
+
                             # Badge de couleur selon la prédiction
                             if confidence >= 0.5:
                                 badge_color = "🔥"
@@ -303,38 +294,34 @@ def main():
                             else:
                                 badge_color = "❄️"
                                 pred_text = t["cold"]
-                            
+
                             # Affichage de l'analyse pour ce deal
                             st.info(
                                 f"**{t['deal_number']}{idx}** : {title[:50]}...\n\n"
                                 f"{badge_color} **{t['potential']} : {pred_text}** | "
                                 f"**{t['reliability']} : {confidence_pct}%**"
                             )
-                    
+
                     st.divider()
-                
+
                 # --- VÉRIFICATION DE LA PRÉSENCE DE DEALS À AFFICHER ---
                 if deals_to_display:
                     # En-tête conditionnel selon le type de deals affichés
                     if has_relevant:
                         # Affichage pour les deals pertinents
-                        st.subheader(
-                            f" {len(relevant_deals)} {t['relevant_deals']}"
-                        )
+                        st.subheader(f" {len(relevant_deals)} {t['relevant_deals']}")
                     else:
                         # Affichage pour les suggestions alternatives
-                        st.subheader(
-                            f"{len(results)} {t['similar_suggestions']}"
-                        )
-                    
+                        st.subheader(f"{len(results)} {t['similar_suggestions']}")
+
                     # --- BOUCLE D'AFFICHAGE DES DEALS ---
                     # Itération sur chaque deal à afficher
                     for deal in deals_to_display:
                         # --- EXTRACTION DES DONNÉES ---
                         # Récupération sécurisée avec valeurs par défaut
-                        title = deal.get('title', 'Sans titre')
-                        price = deal.get('price', 0)
-                        
+                        title = deal.get("title", "Sans titre")
+                        price = deal.get("price", 0)
+
                         # --- AFFICHAGE DU TITRE ET DU PRIX ---
                         # Utilisation de Markdown pour le formatage
                         # :orange[] colore le texte en orange
@@ -343,19 +330,21 @@ def main():
                         # --- MÉTADONNÉES EN LIGNE UNIQUE ---
                         # Préparation de la prédiction ML si disponible
                         pred_text = ""
-                        if deal.get('is_new') or (show_only_new and deal.get('popularity_confidence') is not None):
-                            conf = deal.get('popularity_confidence', 0)
+                        if deal.get("is_new") or (
+                            show_only_new and deal.get("popularity_confidence") is not None
+                        ):
+                            conf = deal.get("popularity_confidence", 0)
                             if conf >= 0.5:
                                 pred_text = f"**{t['prediction_ml']}:** {t['hot']} 🔥 | **{t['reliability']}:** {round(conf * 100)}%"
                             else:
                                 pred_text = f"**{t['prediction_ml']}:** {t['cold']} ❄️ | **{t['reliability']}:** {round(conf * 100)}%"
-                        
+
                         # Création de 5 colonnes pour tous les éléments
                         col1, col2, col3, col4, col5 = st.columns(5)
-                        
+
                         # Colonne 1 : Température du deal
                         with col1:
-                            temp_rating = deal.get('temperature_rating', 0)
+                            temp_rating = deal.get("temperature_rating", 0)
                             if temp_rating >= 100:
                                 temp_icon = "🔥"
                             elif temp_rating >= 50:
@@ -363,21 +352,21 @@ def main():
                             else:
                                 temp_icon = "❄️"
                             st.caption(f"{temp_icon} {t['temp']} : {temp_rating}°C")
-                        
+
                         # Colonne 2 : Statut du deal
                         with col2:
-                            is_new = deal.get('is_new', False)
+                            is_new = deal.get("is_new", False)
                             status_text = t["new"] if is_new else t["old"]
                             st.caption(f"{t['status']} : {status_text}")
-                        
+
                         # Colonne 3 : Score de pertinence
                         with col3:
-                            score_pct = round(deal.get('score', 0) * 100, 1)
+                            score_pct = round(deal.get("score", 0) * 100, 1)
                             st.caption(f"{t['relevance']} : {score_pct}%")
-                        
+
                         # Colonne 4 : Avis communauté
                         with col4:
-                            sentiment_score = deal.get('comments_sentiment_score')
+                            sentiment_score = deal.get("comments_sentiment_score")
                             if sentiment_score is not None:
                                 if sentiment_score >= 4.5:
                                     stars = "⭐⭐⭐⭐⭐"
@@ -392,7 +381,7 @@ def main():
                                 st.caption(f"💬 {stars} ({round(sentiment_score, 1)}/5)")
                             else:
                                 st.caption(f"💬 {t['no_reviews']}")
-                        
+
                         # Colonne 5 : Prédiction ML si disponible
                         with col5:
                             if pred_text:
@@ -406,17 +395,17 @@ def main():
                                 # Séparation du texte en phrases/paragraphes
                                 # Découpage par points suivis d'un espace
                                 sentences = deal["text"].split(". ")
-                                
+
                                 # Création de paragraphes HTML bien séparés
                                 paragraphs_html = ""
                                 for sentence in sentences:
                                     if sentence.strip():  # Ignorer les chaînes vides
                                         # Ajouter le point final s'il a été retiré
                                         sentence_clean = sentence.strip()
-                                        if not sentence_clean.endswith('.'):
+                                        if not sentence_clean.endswith("."):
                                             sentence_clean += "."
                                         paragraphs_html += f"<p>{sentence_clean}</p>"
-                                
+
                                 # Affichage du texte avec justification et séparation des paragraphes
                                 st.markdown(
                                     f"""
@@ -435,7 +424,7 @@ def main():
                                         {paragraphs_html}
                                     </div>
                                     """,
-                                    unsafe_allow_html=True
+                                    unsafe_allow_html=True,
                                 )
 
                         # --- BOUTON D'ACTION ---
@@ -445,7 +434,7 @@ def main():
                             st.link_button(
                                 t["get_deal"],
                                 deal["url"],
-                                use_container_width=True  # Largeur complète
+                                use_container_width=True,  # Largeur complète
                             )
                         else:
                             # Message informatif si pas de lien disponible
@@ -453,7 +442,7 @@ def main():
 
                         # Séparateur entre chaque deal
                         st.divider()
-                        
+
                 else:
                     # --- AUCUN RÉSULTAT TROUVÉ ---
                     # Message adapté selon le mode actif

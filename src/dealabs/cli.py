@@ -2,6 +2,7 @@
 Command-line interface for dealabs-api.
 Provides commands for fetching hot deals, monitoring deals, and viewing thread details.
 """
+
 import time
 import click
 import requests
@@ -18,21 +19,17 @@ def main():
 
 
 @main.command()
-@click.option('--page', default=0, type=int, help='Page number (default: 0)')
-@click.option('--limit', default=25, type=int, help='Number of deals to fetch (default: 25)')
-@click.option('--days', default=1, type=int, help='Number of days to look back (default: 1)')
+@click.option("--page", default=0, type=int, help="Page number (default: 0)")
+@click.option("--limit", default=25, type=int, help="Number of deals to fetch (default: 25)")
+@click.option("--days", default=1, type=int, help="Number of days to look back (default: 1)")
 def hots(page, limit, days):
     """Fetch and display hot deals."""
     try:
         dealabs = Dealabs()
-        params = {
-            'page': page,
-            'limit': limit,
-            'days': days
-        }
+        params = {"page": page, "limit": limit, "days": days}
 
         response = dealabs.get_hot_deals(params)
-        deals_data = response.get('data', [])
+        deals_data = response.get("data", [])
         deals = [Deal(deal_data) for deal_data in deals_data]
 
         click.echo(f"\nFound {len(deals)} hot deals:\n")
@@ -50,9 +47,9 @@ def hots(page, limit, days):
         raise click.Abort()
 
 
-@main.command('get-thread')
-@click.argument('thread_id', type=int, required=True)
-@click.option('--json-output', is_flag=True, help='Output as JSON')
+@main.command("get-thread")
+@click.argument("thread_id", type=int, required=True)
+@click.option("--json-output", is_flag=True, help="Output as JSON")
 def get_thread(thread_id, json_output):
     """Fetch and display thread details."""
     try:
@@ -87,21 +84,22 @@ def get_thread(thread_id, json_output):
         raise click.Abort()
 
 
-@main.command('get-comments')
-@click.argument('thread_id', type=int, required=True)
-@click.option('--page', default=0, type=int, help='Page number (default: 0)')
-@click.option('--limit', default=50, type=int, help='Number of comments to fetch (default: 50)')
-@click.option('--sort', default='new', type=click.Choice(['new', 'hot', 'old']), help='Comment ordering (default: new)')
-@click.option('--json-output', is_flag=True, help='Output as JSON')
+@main.command("get-comments")
+@click.argument("thread_id", type=int, required=True)
+@click.option("--page", default=0, type=int, help="Page number (default: 0)")
+@click.option("--limit", default=50, type=int, help="Number of comments to fetch (default: 50)")
+@click.option(
+    "--sort",
+    default="new",
+    type=click.Choice(["new", "hot", "old"]),
+    help="Comment ordering (default: new)",
+)
+@click.option("--json-output", is_flag=True, help="Output as JSON")
 def get_comments(thread_id, page, limit, sort, json_output):
     """Fetch and display thread comments."""
     try:
         dealabs = Dealabs()
-        params = {
-            'page': page,
-            'limit': limit,
-            'order': sort
-        }
+        params = {"page": page, "limit": limit, "order": sort}
 
         comments = dealabs.get_thread_comments(thread_id, params)
 
@@ -130,13 +128,36 @@ def get_comments(thread_id, page, limit, sort, json_output):
 
 
 @main.command()
-@click.option('--webhook', required=True, help='Webhook URL to send deals to')
-@click.option('--filter', 'filters', multiple=True, help='Filters to apply (can be specified multiple times)')
-@click.option('--keywords', multiple=True, help='Keywords to match in deal titles (can be specified multiple times)')
-@click.option('--categories', multiple=True, help='Categories to match (can be specified multiple times)')
-@click.option('--interval', default=300, type=int, help='Scan interval in seconds (default: 300)')
-@click.option('--min-age', default=300, type=int, help='Minimum age in seconds before processing (default: 300)')
-@click.option('--min-temperature', default=50, type=int, help='Minimum temperature level before processing (default: 50)')
+@click.option("--webhook", required=True, help="Webhook URL to send deals to")
+@click.option(
+    "--filter",
+    "filters",
+    multiple=True,
+    help="Filters to apply (can be specified multiple times)",
+)
+@click.option(
+    "--keywords",
+    multiple=True,
+    help="Keywords to match in deal titles (can be specified multiple times)",
+)
+@click.option(
+    "--categories",
+    multiple=True,
+    help="Categories to match (can be specified multiple times)",
+)
+@click.option("--interval", default=300, type=int, help="Scan interval in seconds (default: 300)")
+@click.option(
+    "--min-age",
+    default=300,
+    type=int,
+    help="Minimum age in seconds before processing (default: 300)",
+)
+@click.option(
+    "--min-temperature",
+    default=50,
+    type=int,
+    help="Minimum temperature level before processing (default: 50)",
+)
 def monitor(webhook, filters, keywords, categories, interval, min_age, min_temperature):
     """Monitor new deals and send to webhook."""
     try:
@@ -153,9 +174,9 @@ def monitor(webhook, filters, keywords, categories, interval, min_age, min_tempe
         while True:
             try:
                 # Get new deals since last check
-                params = {'page': 0, 'limit': 50}
+                params = {"page": 0, "limit": 50}
                 deals = dealabs.get_new_deals(params)
-                deals = list(filter(lambda deal: deal.deal_type == 'deals', deals))
+                deals = list(filter(lambda deal: deal.deal_type == "deals", deals))
 
                 # Sort deals by thread_id to ensure correct processing order
                 deals.sort(key=lambda deal: deal.thread_id)
@@ -174,7 +195,10 @@ def monitor(webhook, filters, keywords, categories, interval, min_age, min_tempe
 
                     # Check if deal is old enough to process
                     if deal.created is None:
-                        click.echo(f"Warning: Deal {deal.thread_id} has no valid creation time, skipping.", err=True)
+                        click.echo(
+                            f"Warning: Deal {deal.thread_id} has no valid creation time, skipping.",
+                            err=True,
+                        )
                         continue
 
                     age_seconds = (current_time - deal.created).total_seconds()
@@ -183,23 +207,27 @@ def monitor(webhook, filters, keywords, categories, interval, min_age, min_tempe
                         # Deal is too recent, skip processing
                         continue
 
-                    title = deal.title.lower() if deal.title else ''
-                    category = deal.category.lower() if deal.category else ''
+                    title = deal.title.lower() if deal.title else ""
+                    category = deal.category.lower() if deal.category else ""
 
                     # Check for keyword or category match
-                    keyword_match = any(kw.lower() in title for kw in keywords) if keywords else True
-                    category_match = any(cat.lower() in category for cat in categories) if categories else True
+                    keyword_match = (
+                        any(kw.lower() in title for kw in keywords) if keywords else True
+                    )
+                    category_match = (
+                        any(cat.lower() in category for cat in categories) if categories else True
+                    )
                     temperature_match = deal.temperature >= min_temperature
 
                     if (keyword_match or category_match) and temperature_match:
                         # Prepare payload
                         payload = {
-                            'title': deal.title,
-                            'url': deal.url,
-                            'price': deal.price,
-                            'category': deal.category,
-                            'merchant': deal.merchant,
-                            'temperature': deal.temperature
+                            "title": deal.title,
+                            "url": deal.url,
+                            "price": deal.price,
+                            "category": deal.category,
+                            "merchant": deal.merchant,
+                            "temperature": deal.temperature,
                         }
 
                         # Send to webhook
@@ -207,12 +235,15 @@ def monitor(webhook, filters, keywords, categories, interval, min_age, min_tempe
                             response = requests.post(
                                 webhook,
                                 data=json.dumps(payload),
-                                headers={'Content-Type': 'application/json'}
+                                headers={"Content-Type": "application/json"},
                             )
                             if response.status_code == 200:
                                 click.echo(f"Sent deal: {deal.title}")
                             else:
-                                click.echo(f"Failed to send deal (Status {response.status_code}): {deal.title}", err=True)
+                                click.echo(
+                                    f"Failed to send deal (Status {response.status_code}): {deal.title}",
+                                    err=True,
+                                )
                         except requests.exceptions.RequestException as e:
                             click.echo(f"Error sending to webhook: {e}", err=True)
 
@@ -236,5 +267,5 @@ def monitor(webhook, filters, keywords, categories, interval, min_age, min_tempe
         raise click.Abort()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
