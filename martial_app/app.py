@@ -281,12 +281,12 @@ def main():
                     if deal.get('is_new') or (show_only_new and deal.get('popularity_confidence') is not None):
                         conf = deal.get('popularity_confidence', 0)
                         if conf >= 0.5:
-                            pred_text = f"🏆 **ML:** CHAUD 🔥 **Conf:** {round(conf * 100)}%"
+                            pred_text = f"Prédiction ML : CHAUD 🔥 ({round(conf * 100)}%)"
                         else:
-                            pred_text = f"🏆 **ML:** FROID ❄️ **Conf:** {round(conf * 100)}%"
+                            pred_text = f"Prédiction ML : FROID ❄️ ({round(conf * 100)}%)"
                     
-                    # Création de 5 colonnes avec proportions adaptées (plus d'espace pour col5)
-                    col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1.2, 1.5])
+                    # Création de 5 colonnes pour tous les éléments
+                    col1, col2, col3, col4, col5 = st.columns(5)
                     
                     # Colonne 1 : Température du deal
                     with col1:
@@ -297,18 +297,18 @@ def main():
                             temp_icon = "🌡️"
                         else:
                             temp_icon = "❄️"
-                        st.caption(f"{temp_icon} {temp_rating}°C")
+                        st.caption(f"{temp_icon} Temp : {temp_rating}°C")
                     
                     # Colonne 2 : Statut du deal
                     with col2:
                         is_new = deal.get('is_new', False)
                         status_text = "Nouveau" if is_new else "Ancien"
-                        st.caption(f"{status_text}")
+                        st.caption(f"Statut : {status_text}")
                     
                     # Colonne 3 : Score de pertinence
                     with col3:
                         score_pct = round(deal.get('score', 0) * 100, 1)
-                        st.caption(f"🎯 {score_pct}%")
+                        st.caption(f"Pertinence : {score_pct}%")
                     
                     # Colonne 4 : Avis communauté
                     with col4:
