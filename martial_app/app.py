@@ -275,94 +275,66 @@ def main():
                     # :orange[] colore le texte en orange
                     st.markdown(f"### :orange[{title}] — **{price}€**")
 
-                    # Si le deal a une prédiction ML, on l'affiche
-                    # (soit is_new=True, soit un deal < 24h avec prédiction en mode filtre)
+                    # --- MÉTADONNÉES EN LIGNE UNIQUE ---
+                    # Préparation de la prédiction ML si disponible
+                    pred_text = ""
                     if deal.get('is_new') or (show_only_new and deal.get('popularity_confidence') is not None):
-                        # Récupération de la confiance de la prédiction ML
                         conf = deal.get('popularity_confidence', 0)
-                        
-                        # Détermination de la prédiction selon le seuil de 0.5
                         if conf >= 0.5:
-                            pred = "CHAUD"
-                            pred_icon = "🔥"
+                            pred_text = f"🏆 CHAUD 🔥 ({round(conf * 100)}%)"
                         else:
-                            pred = "FROID"
-                            pred_icon = "❄️"
-                        
-                        # Affichage du badge Futur Top Deal
-                        st.markdown(f"🏆 **Futur Top Deal :** {pred_icon} {pred}")
-                        
-                        # Affichage d'un bandeau spécial ML
-                        st.info(f"{pred_icon} **Prédiction IA :** Ce deal est prédit **{pred}** "
-                                f"(Fiabilité : {round(conf * 100)}%)")
-
-                    # --- MÉTADONNÉES EN COLONNES ---
-                    # Création de 3 colonnes pour afficher les métadonnées
-                    col1, col2, col3 = st.columns(3)
+                            pred_text = f"🏆 FROID ❄️ ({round(conf * 100)}%)"
                     
-                    # Colonne 1 : Température du deal (en degrés Celsius)
+                    # Création de 5 colonnes pour tous les éléments
+                    col1, col2, col3, col4, col5 = st.columns(5)
+                    
+                    # Colonne 1 : Température du deal
                     with col1:
-                        # Récupération de la température depuis temperature_rating
                         temp_rating = deal.get('temperature_rating', 0)
-                        
-                        # Détermination de l'icône selon la température
                         if temp_rating >= 100:
                             temp_icon = "🔥"
                         elif temp_rating >= 50:
                             temp_icon = "🌡️"
                         else:
                             temp_icon = "❄️"
-                        
-                        st.caption(f"{temp_icon} Température : {temp_rating}°C")
+                        st.caption(f"{temp_icon} Temp : {temp_rating}°C")
                     
-                    # Colonne 2 : Statut du deal (Nouveau/Ancien)
+                    # Colonne 2 : Statut du deal
                     with col2:
-                        # Détermination du statut basé sur is_new
                         is_new = deal.get('is_new', False)
                         if is_new:
-                            status = "Nouveau"
-                            status_icon = "✨"
-                            status_color = "🟢"
+                            status_icon = "✨🟢"
                         else:
-                            status = "Ancien"
-                            status_icon = "📦"
-                            status_color = "⚪"
-                        st.caption(f"{status_color} Statut : {status_icon} {status}")
+                            status_icon = "📦⚪"
+                        st.caption(f"{status_icon} {'Nouveau' if is_new else 'Ancien'}")
                     
-                    # Colonne 3 : Score de pertinence en pourcentage
+                    # Colonne 3 : Score de pertinence
                     with col3:
-                        # Conversion du score (0-1) en pourcentage
-                        # arrondi à 1 décimale
                         score_pct = round(deal.get('score', 0) * 100, 1)
                         st.caption(f"🎯 Pertinence : {score_pct}%")
-
-                    # --- AVIS COMMUNAUTÉ ---
-                    # Affichage du sentiment de la communauté basé sur les commentaires
-                    sentiment_score = deal.get('comments_sentiment_score')
-                    if sentiment_score is not None:
-                        # Conversion du score en qualification et étoiles
-                        if sentiment_score >= 4.5:
-                            qualification = "Excellent"
-                            stars = "⭐⭐⭐⭐⭐"
-                        elif sentiment_score >= 3.5:
-                            qualification = "Très bien"
-                            stars = "⭐⭐⭐⭐"
-                        elif sentiment_score >= 2.5:
-                            qualification = "Bien"
-                            stars = "⭐⭐⭐"
-                        elif sentiment_score >= 1.5:
-                            qualification = "Moyen"
-                            stars = "⭐⭐"
+                    
+                    # Colonne 4 : Avis communauté
+                    with col4:
+                        sentiment_score = deal.get('comments_sentiment_score')
+                        if sentiment_score is not None:
+                            if sentiment_score >= 4.5:
+                                avis = "Excellent ⭐⭐⭐⭐⭐"
+                            elif sentiment_score >= 3.5:
+                                avis = "Très bien ⭐⭐⭐⭐"
+                            elif sentiment_score >= 2.5:
+                                avis = "Bien ⭐⭐⭐"
+                            elif sentiment_score >= 1.5:
+                                avis = "Moyen ⭐⭐"
+                            else:
+                                avis = "Faible ⭐"
+                            st.caption(f"💬 {avis}")
                         else:
-                            qualification = "Faible"
-                            stars = "⭐"
-                        
-                        # Affichage avec un bandeau coloré
-                        st.markdown(f"**💬 Avis communauté :** {qualification} {stars}")
-                        st.caption(f"Score sentiment : {round(sentiment_score, 1)}/5")
-                    else:
-                        # Aucun avis disponible
-                        st.markdown(f"**💬 Avis communauté :** Pas encore d'avis")
+                            st.caption(f"💬 Pas encore d'avis")
+                    
+                    # Colonne 5 : Prédiction ML si disponible
+                    with col5:
+                        if pred_text:
+                            st.caption(pred_text)
 
                     # --- DESCRIPTION DÉTAILLÉE (EXPANDER) ---
                     # Vérification de la présence du champ 'text'
