@@ -130,29 +130,11 @@ def main():
 
             # --- LOGIQUE DE FILTRAGE ML ---
             if show_only_new and results:
-                from datetime import datetime, timezone
-                # Filtrer uniquement les deals avec durée < 5h (nouveaux deals)
-                filtered_results = []
-                now = datetime.now(timezone.utc)
-                
-                for deal in results:
-                    deal_timestamp = deal.get('submitted')
-                    if deal_timestamp:
-                        # Conversion du timestamp Unix en datetime
-                        deal_datetime = datetime.fromtimestamp(deal_timestamp, tz=timezone.utc)
-                        
-                        # Calcul de la durée en heures
-                        delta = now - deal_datetime
-                        hours = delta.total_seconds() / 3600
-                        
-                        # Ne garder que les deals < 5h avec prédiction ML
-                        if hours < 5 and (deal.get('popularity_prediction') or deal.get('popularity_confidence')):
-                            filtered_results.append(deal)
-                
-                results = filtered_results
+                # Filtrer uniquement les deals avec is_new = True (nouveaux deals prometteurs)
+                results = [deal for deal in results if deal.get('is_new') is True]
                 
                 if not results:
-                    st.info("Aucun nouveau deal prometteur (< 5h) trouvé pour cette recherche.")
+                    st.info("Aucun nouveau deal prometteur trouvé pour cette recherche.")
 
             # --- VÉRIFICATION DES RÉSULTATS ---
             if results:
