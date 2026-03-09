@@ -225,7 +225,6 @@ def main():
                 ]
 
                 # Flag booléen : True si au moins un deal pertinent existe
-                # Flag booléen : True si au moins un deal pertinent existe
                 has_relevant = len(relevant_deals) > 0
 
                 # --- SECTION ANALYSE CHATBOT (LLM) ---
@@ -264,7 +263,6 @@ def main():
                         # Gestion des erreurs lors de l'appel au LLM
                         st.error(f"{t['error_llm']} {e}")
 
-                # Ligne de séparation visuelle entre sections
                 # Ligne de séparation visuelle entre sections
                 st.divider()
 
