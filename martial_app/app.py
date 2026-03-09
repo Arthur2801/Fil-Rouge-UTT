@@ -302,16 +302,12 @@ def main():
                     # Colonne 2 : Statut du deal
                     with col2:
                         is_new = deal.get('is_new', False)
-                        if is_new:
-                            status_icon = "✨🟢"
-                        else:
-                            status_icon = "📦⚪"
-                        st.caption(f"{status_icon} {'Nouveau' if is_new else 'Ancien'}")
+                        st.caption(f"Statut : {'Nouveau' if is_new else 'Ancien'}")
                     
                     # Colonne 3 : Score de pertinence
                     with col3:
                         score_pct = round(deal.get('score', 0) * 100, 1)
-                        st.caption(f"🎯 Pertinence : {score_pct}%")
+                        st.caption(f"Pertinence : {score_pct}%")
                     
                     # Colonne 4 : Avis communauté
                     with col4:
