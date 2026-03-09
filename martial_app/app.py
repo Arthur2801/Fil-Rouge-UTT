@@ -329,7 +329,7 @@ def main():
                                 avis = "Moyen ⭐⭐"
                             else:
                                 avis = "Faible ⭐"
-                            st.caption(f"💬 {avis}")
+                            st.caption(f"💬 {avis} ({round(sentiment_score, 1)}/5)")
                         else:
                             st.caption(f"💬 Pas encore d'avis")
                     
