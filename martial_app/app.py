@@ -24,8 +24,12 @@ from PIL import Image
 # Imports locaux depuis le module rag_logic
 from rag_logic import (
     get_deals_rag,
-    get_llm_answer
+    get_llm_answer,
+    detect_language
 )
+
+# Import du module de traduction
+from i18n import get_all_translations
 
 
 def detect_browser_language():
@@ -174,8 +178,18 @@ def main():
     # --- TRAITEMENT DE LA RECHERCHE ---
     # Vérification qu'une requête existe avant de lancer la recherche
     if query:
+        # --- DÉTECTION DE LA LANGUE ---
+        # Détection de la langue de la requête pour adapter l'interface
+        detected_lang = detect_language(query)
+        st.session_state.current_lang = detected_lang
+        
+        # Chargement des traductions pour la langue détectée
+        t = get_all_translations(detected_lang)
+        
         # Affichage d'un spinner pendant la recherche vectorielle
-        with st.spinner("Recherche sémantique..."):
+        with st.spinner("Recherche sémantique..." if detected_lang == "fr" 
+                       else "Semantic search..." if detected_lang == "en"
+                       else "Búsqueda semántica..."):
             # Appel de la fonction RAG pour rechercher les deals
             # Étapes 4 à 6 du processus RAG :
             # - Vectorisation de la requête
@@ -223,26 +237,22 @@ def main():
                 # Affichage conditionnel selon la pertinence des résultats
                 if has_relevant:
                     # Cas 1 : Des deals pertinents ont été trouvés
-                    st.subheader("🤖 Analyse de l'Assistant")
+                    st.subheader(t["assistant_analysis"])
                     
                     # Message informatif avec le nombre de deals pertinents
                     st.info(
-                        f"**{len(relevant_deals)} deal(s) pertinent(s) "
-                        f"trouvé(s)** pour votre recherche"
+                        f"**{len(relevant_deals)} {t['deals_found']}**"
                     )
                 else:
                     # Cas 2 : Aucun deal pertinent, seulement des suggestions
-                    st.subheader("💡 Suggestions Alternatives")
+                    st.subheader(t["alternative_suggestions"])
                     
                     # Message d'avertissement expliquant la situation
-                    st.warning(
-                        "Aucun deal exact trouvé. Voici des suggestions "
-                        "similaires qui pourraient vous intéresser :"
-                    )
+                    st.warning(t["no_exact_deal"])
                 
                 # --- GÉNÉRATION DE LA RÉPONSE LLM ---
                 # Spinner pendant l'analyse par le modèle de langage
-                with st.spinner("Analyse en cours..."):
+                with st.spinner(t["analyzing"]):
                     try:
                         # Sélection des deals à analyser par le LLM
                         # Si pertinents trouvés : uniquement ceux-ci
@@ -261,10 +271,7 @@ def main():
                         
                     except Exception as e:
                         # Gestion des erreurs lors de l'appel au LLM
-                        st.error(
-                            f"Erreur lors de la génération de la "
-                            f"réponse : {e}"
-                        )
+                        st.error(f"{t['error_llm']} {e}")
                 
                 # Ligne de séparation visuelle entre sections
                 # Ligne de séparation visuelle entre sections
@@ -276,7 +283,7 @@ def main():
                 
                 # --- ENCART ANALYSE PRÉDICTIVE IA (MODE ANTICIPATION) ---
                 if show_only_new and deals_to_display:
-                    st.subheader("🤖 Analyse Prédictive IA")
+                    st.subheader(t["predictive_analysis"])
                     
                     # Conteneur pour l'analyse prédictive globale
                     with st.container():
@@ -292,16 +299,16 @@ def main():
                             # Badge de couleur selon la prédiction
                             if confidence >= 0.5:
                                 badge_color = "🔥"
-                                pred_text = "CHAUD"
+                                pred_text = t["hot"]
                             else:
                                 badge_color = "❄️"
-                                pred_text = "FROID"
+                                pred_text = t["cold"]
                             
                             # Affichage de l'analyse pour ce deal
                             st.info(
-                                f"**Deal #{idx}** : {title[:50]}...\n\n"
-                                f"{badge_color} **Potentiel : {pred_text}** | "
-                                f"**Fiabilité : {confidence_pct}%**"
+                                f"**{t['deal_number']}{idx}** : {title[:50]}...\n\n"
+                                f"{badge_color} **{t['potential']} : {pred_text}** | "
+                                f"**{t['reliability']} : {confidence_pct}%**"
                             )
                     
                     st.divider()
@@ -312,12 +319,12 @@ def main():
                     if has_relevant:
                         # Affichage pour les deals pertinents
                         st.subheader(
-                            f" {len(relevant_deals)} Deal(s) Pertinent(s)"
+                            f" {len(relevant_deals)} {t['relevant_deals']}"
                         )
                     else:
                         # Affichage pour les suggestions alternatives
                         st.subheader(
-                            f"🔍 {len(results)} Suggestion(s) Similaire(s)"
+                            f"{len(results)} {t['similar_suggestions']}"
                         )
                     
                     # --- BOUCLE D'AFFICHAGE DES DEALS ---
@@ -339,9 +346,9 @@ def main():
                         if deal.get('is_new') or (show_only_new and deal.get('popularity_confidence') is not None):
                             conf = deal.get('popularity_confidence', 0)
                             if conf >= 0.5:
-                                pred_text = f"**Prédiction ML:** CHAUD 🔥 | **Fiabilité:** {round(conf * 100)}%"
+                                pred_text = f"**{t['prediction_ml']}:** {t['hot']} 🔥 | **{t['reliability']}:** {round(conf * 100)}%"
                             else:
-                                pred_text = f"**Prédiction ML:** FROID ❄️ | **Fiabilité:** {round(conf * 100)}%"
+                                pred_text = f"**{t['prediction_ml']}:** {t['cold']} ❄️ | **{t['reliability']}:** {round(conf * 100)}%"
                         
                         # Création de 5 colonnes pour tous les éléments
                         col1, col2, col3, col4, col5 = st.columns(5)
@@ -355,18 +362,18 @@ def main():
                                 temp_icon = "🌡️"
                             else:
                                 temp_icon = "❄️"
-                            st.caption(f"{temp_icon} Temp : {temp_rating}°C")
+                            st.caption(f"{temp_icon} {t['temp']} : {temp_rating}°C")
                         
                         # Colonne 2 : Statut du deal
                         with col2:
                             is_new = deal.get('is_new', False)
-                            status_text = "Nouveau" if is_new else "Ancien"
-                            st.caption(f"Statut : {status_text}")
+                            status_text = t["new"] if is_new else t["old"]
+                            st.caption(f"{t['status']} : {status_text}")
                         
                         # Colonne 3 : Score de pertinence
                         with col3:
                             score_pct = round(deal.get('score', 0) * 100, 1)
-                            st.caption(f"Pertinence : {score_pct}%")
+                            st.caption(f"{t['relevance']} : {score_pct}%")
                         
                         # Colonne 4 : Avis communauté
                         with col4:
@@ -384,7 +391,7 @@ def main():
                                     stars = "⭐"
                                 st.caption(f"💬 {stars} ({round(sentiment_score, 1)}/5)")
                             else:
-                                st.caption(f"💬 Pas d'avis")
+                                st.caption(f"💬 {t['no_reviews']}")
                         
                         # Colonne 5 : Prédiction ML si disponible
                         with col5:
@@ -395,9 +402,7 @@ def main():
                         # Vérification de la présence du champ 'text'
                         if "text" in deal:
                             # Widget expander pour afficher/masquer les détails
-                            with st.expander(
-                                "Voir les détails et la description complète"
-                            ):
+                            with st.expander(t["view_details"]):
                                 # Nettoyage du texte : ajout de sauts de ligne
                                 # après chaque point pour améliorer la lisibilité
                                 clean_text = deal["text"].replace(". ", ".\n\n")
@@ -408,13 +413,13 @@ def main():
                         if "url" in deal and deal["url"]:
                             # Bouton lien vers le deal sur Dealabs
                             st.link_button(
-                                "🚀 PROFITER DE L'OFFRE SUR LE SITE",
+                                t["get_deal"],
                                 deal["url"],
                                 use_container_width=True  # Largeur complète
                             )
                         else:
                             # Message informatif si pas de lien disponible
-                            st.info("ℹ️ Lien indisponible")
+                            st.info(t["link_unavailable"])
 
                         # Séparateur entre chaque deal
                         st.divider()
@@ -424,16 +429,10 @@ def main():
                     # Message adapté selon le mode actif
                     if show_only_new:
                         # Mode Anticipation actif : message spécifique
-                        st.info(
-                            "🔮 Aucun nouveau deal prometteur détecté pour cette recherche. "
-                            "Essayez de désactiver le Mode Anticipation pour voir tous les résultats."
-                        )
+                        st.info(t["no_new_deals"])
                     else:
                         # Recherche classique : message d'erreur technique
-                        st.warning(
-                            "Aucun deal ne correspond. "
-                            "Vérifiez l'index vectoriel Atlas."
-                        )
+                        st.warning(t["no_results"])
 
 
 # --- POINT D'ENTRÉE DU PROGRAMME ---
