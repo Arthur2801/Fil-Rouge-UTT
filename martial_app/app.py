@@ -403,21 +403,36 @@ def main():
                         if "text" in deal:
                             # Widget expander pour afficher/masquer les détails
                             with st.expander(t["view_details"]):
-                                # Nettoyage du texte : ajout de sauts de ligne
-                                # après chaque point pour améliorer la lisibilité
-                                clean_text = deal["text"].replace(". ", ".  \n")
+                                # Séparation du texte en phrases/paragraphes
+                                # Découpage par points suivis d'un espace
+                                sentences = deal["text"].split(". ")
                                 
-                                # Affichage du texte avec justification et mise en forme
+                                # Création de paragraphes HTML bien séparés
+                                paragraphs_html = ""
+                                for sentence in sentences:
+                                    if sentence.strip():  # Ignorer les chaînes vides
+                                        # Ajouter le point final s'il a été retiré
+                                        sentence_clean = sentence.strip()
+                                        if not sentence_clean.endswith('.'):
+                                            sentence_clean += "."
+                                        paragraphs_html += f"<p>{sentence_clean}</p>"
+                                
+                                # Affichage du texte avec justification et séparation des paragraphes
                                 st.markdown(
                                     f"""
                                     <div style="
                                         text-align: justify;
                                         text-justify: inter-word;
-                                        line-height: 1.8;
                                         font-size: 15px;
-                                        padding: 10px 0;
                                     ">
-                                        {clean_text}
+                                        <style>
+                                            p {{
+                                                line-height: 1.8;
+                                                margin-bottom: 15px;
+                                                margin-top: 0;
+                                            }}
+                                        </style>
+                                        {paragraphs_html}
                                     </div>
                                     """,
                                     unsafe_allow_html=True
