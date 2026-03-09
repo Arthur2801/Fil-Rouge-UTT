@@ -341,7 +341,12 @@ def main():
 
                         # Colonne 1 : Température du deal
                         with col1:
-                            temp_rating = deal.get("temperature_rating", 0)
+                            # Logique conditionnelle : new_temperature_rating si all_comments existe, sinon temperature_rating
+                            if deal.get("all_comments"):
+                                temp_rating = deal.get("new_temperature_rating", 0)
+                            else:
+                                temp_rating = deal.get("temperature_rating", 0)
+                            
                             if temp_rating >= 100:
                                 temp_icon = "🔥"
                             elif temp_rating >= 50:
