@@ -83,6 +83,34 @@ def get_llm_answer(query, context_documents):
     # On récupère la clé enregistrée dans les secrets de Streamlit
     api_key = os.getenv("GROQ_API_KEY")
 
+    # --- DÉTECTION DE LA LANGUE DE LA QUESTION ---
+    # Détection simple basée sur des mots-clés courants
+    query_lower = query.lower()
+    
+    # Mots-clés anglais courants
+    english_keywords = ['the', 'for', 'looking', 'find', 'want', 'need', 'buy', 'search', 
+                       'best', 'good', 'cheap', 'price', 'deal', 'where', 'how', 'what',
+                       'laptop', 'phone', 'gaming', 'pc', 'computer', 'i\'m', 'i am']
+    
+    # Mots-clés espagnols courants
+    spanish_keywords = ['el', 'la', 'los', 'para', 'busco', 'quiero', 'necesito', 
+                       'mejor', 'bueno', 'barato', 'precio', 'donde', 'como', 'qué']
+    
+    # Comptage des correspondances
+    english_count = sum(1 for kw in english_keywords if kw in query_lower)
+    spanish_count = sum(1 for kw in spanish_keywords if kw in query_lower)
+    
+    # Détermination de la langue
+    if english_count > 0 and english_count >= spanish_count:
+        detected_lang = "en"
+        lang_instruction = "YOU MUST RESPOND IN ENGLISH. Answer the following question in English only."
+    elif spanish_count > 0:
+        detected_lang = "es"
+        lang_instruction = "DEBES RESPONDER EN ESPAÑOL. Responde la siguiente pregunta solo en español."
+    else:
+        detected_lang = "fr"
+        lang_instruction = "TU DOIS RÉPONDRE EN FRANÇAIS. Réponds à la question suivante uniquement en français."
+
     # --- INITIALISATION DU LLM ---
     # Configuration du client GROQ avec:
     # - groq_api_key: authentification
@@ -96,20 +124,10 @@ def get_llm_answer(query, context_documents):
 
     # --- CONSTRUCTION DU PROMPT ---
     # Template de prompt avec instructions détaillées pour le LLM
-    # Utilise des placeholders {context} et {question}
+    # Utilise des placeholders {context}, {question} et {lang_instruction}
     template = """
-    ⚠️ RÈGLE ABSOLUE - ADAPTATION LINGUISTIQUE ⚠️
-    AVANT TOUTE CHOSE : Identifie la langue de la question de l'utilisateur et réponds EXCLUSIVEMENT dans cette même langue.
-    
-    ❌ INTERDIT : Répondre dans une langue différente de celle de la question.
-    ✅ OBLIGATOIRE : Utiliser exactement la même langue que l'utilisateur.
-    
-    Exemples concrets :
-    • Question en FRANÇAIS → Réponse entièrement en FRANÇAIS
-    • Question en ANGLAIS → Réponse entièrement en ANGLAIS (Full answer in English)
-    • Question en ESPAGNOL → Respuesta completa en ESPAÑOL
-    
-    Vérifie systématiquement la langue de la question avant de répondre.
+    🌍 LANGUAGE INSTRUCTION / INSTRUCTION LINGUISTIQUE 🌍
+    {lang_instruction}
     
     ---
     
@@ -140,11 +158,6 @@ def get_llm_answer(query, context_documents):
     - De chercher dans une catégorie complémentaire (ex: accessoires pour le produit trouvé, housse, garantie étendue)
     - De vérifier si des deals similaires avec une meilleure fiabilité IA ou un meilleur sentiment social existent
     - De consulter d'autres offres dans une gamme de prix différente
-    
-    Exemples de fin de réponse :
-    - "Souhaitez-vous que je cherche des offres similaires sur d'autres marques ?"
-    - "Préférez-vous que je trouve des accessoires en promotion pour accompagner cet achat ?"
-    - "Voulez-vous explorer des options dans une gamme de prix supérieure avec de meilleures spécifications ?"
 
     CONTEXTE (Deals trouvés) :
     {context}
@@ -152,7 +165,7 @@ def get_llm_answer(query, context_documents):
     QUESTION :
     {question}
 
-    ⚠️ RAPPEL IMPORTANT : Réponds dans la MÊME LANGUE que la question ci-dessus !
+    ⚠️ CRITICAL: {lang_instruction}
     
     RÉPONSE :
     """
@@ -196,7 +209,8 @@ def get_llm_answer(query, context_documents):
     # .invoke() exécute le prompt avec les valeurs fournies
     response = chain.invoke({
         "context": context_text,
-        "question": query
+        "question": query,
+        "lang_instruction": lang_instruction
     })
     
     # Retour du contenu textuel de la réponse
