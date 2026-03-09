@@ -39,18 +39,20 @@ from langchain_core.runnables import RunnablePassthrough  # Chaînes LangChain
 load_dotenv()
 
 
-def get_llm_answer(query, context_documents, user_lang="fr"):
+def get_llm_answer(query, context_documents):
     """
     Génère une réponse intelligente en utilisant un LLM (GROQ).
     
     Cette fonction prend une requête utilisateur et des documents de contexte
     (deals trouvés), puis utilise un modèle de langage pour générer une
-    réponse pertinente et comparative dans la langue de l'utilisateur.
+    réponse pertinente et comparative dans la langue de la question.
+    
+    Le LLM détecte automatiquement la langue de la question et répond
+    dans cette même langue, quelle que soit la langue du navigateur.
     
     Args:
         query (str): La question/requête de l'utilisateur.
         context_documents (list): Liste de dictionnaires contenant les deals.
-        user_lang (str): Code langue de l'utilisateur (fr, en, es, etc.)
     
     Processus:
         1. Récupération de la clé API GROQ depuis l'environnement
@@ -102,6 +104,13 @@ def get_llm_answer(query, context_documents, user_lang="fr"):
     2. Fiabilité : Le degré de certitude de cette prédiction.
     3. Sentiment Social : La note moyenne des avis des membres (si disponible).
 
+    ### RÈGLE PRIORITAIRE - LANGUE :
+    **IMPORTANT : Réponds OBLIGATOIREMENT dans la MÊME LANGUE que celle utilisée par l'utilisateur pour poser sa question.**
+    - Si la question est en français → réponds en français
+    - Si la question est en anglais → réponds en anglais  
+    - Si la question est en espagnol → réponds en espagnol
+    - Détecte automatiquement la langue de la question et adapte-toi.
+
     ### RÈGLES D'INTERPRÉTATION ET DE CONSEIL :
     - Si la Prédiction est "CHAUD" avec une Fiabilité > 85% : Recommande vivement le deal comme une opportunité rare.
     - Si le Sentiment Social est élevé (> 4/5) : Utilise-le pour valider la qualité réelle du produit ("La communauté confirme que...").
@@ -112,7 +121,6 @@ def get_llm_answer(query, context_documents, user_lang="fr"):
     - Reste toujours factuel et bienveillant. 
     - Ne force pas l'achat, suggère l'opportunité. 
     - Utilise un langage clair : parle de "Potentiel détecté par notre IA" et de "Retour de la communauté".
-    - Réponds TOUJOURS dans la langue utilisée par l'utilisateur dans sa question.
     - Sois concis mais informatif (maximum 200 mots).
 
     CONTEXTE (Deals trouvés) :

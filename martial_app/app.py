@@ -255,7 +255,8 @@ def main():
                         # - Construction du prompt avec contexte
                         # - Envoi au LLM (GROQ)
                         # - Récupération et affichage de la réponse
-                        answer = get_llm_answer(query, deals_to_analyze, user_lang)
+                        # Le LLM détecte automatiquement la langue de la question
+                        answer = get_llm_answer(query, deals_to_analyze)
                         st.write(answer)
                         
                     except Exception as e:
