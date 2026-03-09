@@ -265,17 +265,26 @@ def main():
                     # Création de 3 colonnes pour afficher les métadonnées
                     col1, col2, col3 = st.columns(3)
                     
-                    # Colonne 1 : Température Dealabs (en degrés)
+                    # Colonne 1 : Niveau de température du deal
                     with col1:
-                        # Récupération de la température Dealabs
-                        temp_dealabs = deal.get('temp', 0)
-                        if temp_dealabs >= 100:
-                            temp_icon = "🔥"  # Très chaud
-                        elif temp_dealabs >= 50:
-                            temp_icon = "🌡️"  # Chaud
+                        # Récupération du niveau de température depuis temperature_level
+                        temp_level = deal.get('temperature_level', 'N/A')
+                        
+                        # Détermination de l'icône selon le niveau
+                        if temp_level and isinstance(temp_level, str):
+                            temp_lower = temp_level.lower()
+                            if 'hot' in temp_lower or 'chaud' in temp_lower:
+                                temp_icon = "🔥"
+                            elif 'warm' in temp_lower or 'tiède' in temp_lower:
+                                temp_icon = "🌡️"
+                            elif 'cold' in temp_lower or 'froid' in temp_lower:
+                                temp_icon = "❄️"
+                            else:
+                                temp_icon = "📊"
                         else:
-                            temp_icon = "❄️"  # Froid
-                        st.caption(f"{temp_icon} Température : {temp_dealabs}°")
+                            temp_icon = "📊"
+                        
+                        st.caption(f"{temp_icon} Température : {temp_level}")
                     
                     # Colonne 2 : Statut du deal (Nouveau/Ancien)
                     with col2:
