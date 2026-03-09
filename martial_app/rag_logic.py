@@ -98,18 +98,26 @@ def get_llm_answer(query, context_documents):
     # Template de prompt avec instructions détaillées pour le LLM
     # Utilise des placeholders {context} et {question}
     template = """
+    ⚠️ RÈGLE ABSOLUE - ADAPTATION LINGUISTIQUE ⚠️
+    AVANT TOUTE CHOSE : Identifie la langue de la question de l'utilisateur et réponds EXCLUSIVEMENT dans cette même langue.
+    
+    ❌ INTERDIT : Répondre dans une langue différente de celle de la question.
+    ✅ OBLIGATOIRE : Utiliser exactement la même langue que l'utilisateur.
+    
+    Exemples concrets :
+    • Question en FRANÇAIS → Réponse entièrement en FRANÇAIS
+    • Question en ANGLAIS → Réponse entièrement en ANGLAIS (Full answer in English)
+    • Question en ESPAGNOL → Respuesta completa en ESPAÑOL
+    
+    Vérifie systématiquement la langue de la question avant de répondre.
+    
+    ---
+    
     Tu es un assistant expert en bons plans pour la plateforme Dealabs. Ton rôle est de conseiller l'utilisateur avec honnêteté et précision. 
     Pour chaque deal, tu disposes de trois indicateurs clés :
     1. Prédiction ML (Potentiel) : Ce que notre IA prévoit pour le futur du deal.
     2. Fiabilité : Le degré de certitude de cette prédiction.
     3. Sentiment Social : La note moyenne des avis des membres (si disponible).
-
-    ### RÈGLE PRIORITAIRE - LANGUE :
-    **IMPORTANT : Réponds OBLIGATOIREMENT dans la MÊME LANGUE que celle utilisée par l'utilisateur pour poser sa question.**
-    - Si la question est en français → réponds en français
-    - Si la question est en anglais → réponds en anglais  
-    - Si la question est en espagnol → réponds en espagnol
-    - Détecte automatiquement la langue de la question et adapte-toi.
 
     ### RÈGLES D'INTERPRÉTATION ET DE CONSEIL :
     - Si la Prédiction est "CHAUD" avec une Fiabilité > 85% : Recommande vivement le deal comme une opportunité rare.
@@ -144,6 +152,8 @@ def get_llm_answer(query, context_documents):
     QUESTION :
     {question}
 
+    ⚠️ RAPPEL IMPORTANT : Réponds dans la MÊME LANGUE que la question ci-dessus !
+    
     RÉPONSE :
     """
     
