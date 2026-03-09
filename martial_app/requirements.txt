@@ -3,7 +3,7 @@
 # ==============================================================================
 # Application: Assistant Intelligent Dealabs (Recherche RAG)
 # Python: 3.9+ (testé avec Python 3.13)
-# Dernière mise à jour: Janvier 2026
+# Dernière mise à jour: Mars 2026
 # ==============================================================================
 
 # --- FRAMEWORK WEB ---
