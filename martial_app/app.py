@@ -320,18 +320,18 @@ def main():
                         sentiment_score = deal.get('comments_sentiment_score')
                         if sentiment_score is not None:
                             if sentiment_score >= 4.5:
-                                avis = "Excellent ⭐⭐⭐⭐⭐"
+                                stars = "⭐⭐⭐⭐⭐"
                             elif sentiment_score >= 3.5:
-                                avis = "Très bien ⭐⭐⭐⭐"
+                                stars = "⭐⭐⭐⭐"
                             elif sentiment_score >= 2.5:
-                                avis = "Bien ⭐⭐⭐"
+                                stars = "⭐⭐⭐"
                             elif sentiment_score >= 1.5:
-                                avis = "Moyen ⭐⭐"
+                                stars = "⭐⭐"
                             else:
-                                avis = "Faible ⭐"
-                            st.caption(f"💬 {avis} ({round(sentiment_score, 1)}/5)")
+                                stars = "⭐"
+                            st.caption(f"💬 {stars} {round(sentiment_score, 1)}/5")
                         else:
-                            st.caption(f"💬 Pas encore d'avis")
+                            st.caption(f"💬 Pas d'avis")
                     
                     # Colonne 5 : Prédiction ML si disponible
                     with col5:
