@@ -73,9 +73,9 @@ def main():
 
     # --- NOUVEAU : FILTRE POUR LES DEALS PRÉDITS PAR LE ML ---
     st.sidebar.divider()  # Petite ligne de séparation
-    st.sidebar.subheader("Futurs Tops Deals")
+    st.sidebar.subheader("Sélection IA : Futurs top deals")
     # Ce toggle permet d'activer le filtre "Nouveaux deals prometteurs"
-    show_only_new = st.sidebar.toggle("Afficher uniquement les futurs tops deals", value=False)
+    show_only_new = st.sidebar.toggle("Uniquement les futurs tops deals", value=False)
 
     # --- ZONE PRINCIPALE : TITRE ET BARRE DE RECHERCHE ---
     # Affichage du titre principal de l'application
