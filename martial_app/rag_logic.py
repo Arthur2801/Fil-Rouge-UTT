@@ -547,7 +547,6 @@ def get_deals_rag(query, max_price=1200):
                 "main_group_name": 1,  # Catégorie du deal
                 "url": 1,  # Lien vers la page Dealabs
                 "text": 1,  # Description complète du deal
-                "temperature_level": 1,  # Niveau de température Dealabs
                 "temperature_rating": 1,  # Température du deal (en degrés Celsius)
                 "submitted": 1,  # Date de publication (timestamp Unix)
                 "is_new": 1,  # Deal marqué comme nouveau
