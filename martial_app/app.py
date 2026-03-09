@@ -306,124 +306,134 @@ def main():
                     
                     st.divider()
                 
-                # En-tête conditionnel selon le type de deals affichés
-                if has_relevant:
-                    # Affichage pour les deals pertinents
-                    st.subheader(
-                        f" {len(relevant_deals)} Deal(s) Pertinent(s)"
-                    )
-                else:
-                    # Affichage pour les suggestions alternatives
-                    st.subheader(
-                        f"🔍 {len(results)} Suggestion(s) Similaire(s)"
-                    )
-                
-                # --- BOUCLE D'AFFICHAGE DES DEALS ---
-                # Itération sur chaque deal à afficher
-                for deal in deals_to_display:
-                    # --- EXTRACTION DES DONNÉES ---
-                    # Récupération sécurisée avec valeurs par défaut
-                    title = deal.get('title', 'Sans titre')
-                    price = deal.get('price', 0)
-                    
-                    # --- AFFICHAGE DU TITRE ET DU PRIX ---
-                    # Utilisation de Markdown pour le formatage
-                    # :orange[] colore le texte en orange
-                    st.markdown(f"### :orange[{title}] — **{price}€**")
-
-                    # --- MÉTADONNÉES EN LIGNE UNIQUE ---
-                    # Préparation de la prédiction ML si disponible
-                    pred_text = ""
-                    if deal.get('is_new') or (show_only_new and deal.get('popularity_confidence') is not None):
-                        conf = deal.get('popularity_confidence', 0)
-                        if conf >= 0.5:
-                            pred_text = f"**Prédiction ML:** CHAUD 🔥 | **Fiabilité:** {round(conf * 100)}%"
-                        else:
-                            pred_text = f"**Prédiction ML:** FROID ❄️ | **Fiabilité:** {round(conf * 100)}%"
-                    
-                    # Création de 5 colonnes pour tous les éléments
-                    col1, col2, col3, col4, col5 = st.columns(5)
-                    
-                    # Colonne 1 : Température du deal
-                    with col1:
-                        temp_rating = deal.get('temperature_rating', 0)
-                        if temp_rating >= 100:
-                            temp_icon = "🔥"
-                        elif temp_rating >= 50:
-                            temp_icon = "🌡️"
-                        else:
-                            temp_icon = "❄️"
-                        st.caption(f"{temp_icon} Temp : {temp_rating}°C")
-                    
-                    # Colonne 2 : Statut du deal
-                    with col2:
-                        is_new = deal.get('is_new', False)
-                        status_text = "Nouveau" if is_new else "Ancien"
-                        st.caption(f"Statut : {status_text}")
-                    
-                    # Colonne 3 : Score de pertinence
-                    with col3:
-                        score_pct = round(deal.get('score', 0) * 100, 1)
-                        st.caption(f"Pertinence : {score_pct}%")
-                    
-                    # Colonne 4 : Avis communauté
-                    with col4:
-                        sentiment_score = deal.get('comments_sentiment_score')
-                        if sentiment_score is not None:
-                            if sentiment_score >= 4.5:
-                                stars = "⭐⭐⭐⭐⭐"
-                            elif sentiment_score >= 3.5:
-                                stars = "⭐⭐⭐⭐"
-                            elif sentiment_score >= 2.5:
-                                stars = "⭐⭐⭐"
-                            elif sentiment_score >= 1.5:
-                                stars = "⭐⭐"
-                            else:
-                                stars = "⭐"
-                            st.caption(f"💬 {stars} ({round(sentiment_score, 1)}/5)")
-                        else:
-                            st.caption(f"💬 Pas d'avis")
-                    
-                    # Colonne 5 : Prédiction ML si disponible
-                    with col5:
-                        if pred_text:
-                            st.caption(pred_text)
-
-                    # --- DESCRIPTION DÉTAILLÉE (EXPANDER) ---
-                    # Vérification de la présence du champ 'text'
-                    if "text" in deal:
-                        # Widget expander pour afficher/masquer les détails
-                        with st.expander(
-                            "Voir les détails et la description complète"
-                        ):
-                            # Nettoyage du texte : ajout de sauts de ligne
-                            # après chaque point pour améliorer la lisibilité
-                            clean_text = deal["text"].replace(". ", ".\n\n")
-                            st.write(clean_text)
-
-                    # --- BOUTON D'ACTION ---
-                    # Vérification de la présence et validité de l'URL
-                    if "url" in deal and deal["url"]:
-                        # Bouton lien vers le deal sur Dealabs
-                        st.link_button(
-                            "🚀 PROFITER DE L'OFFRE SUR LE SITE",
-                            deal["url"],
-                            use_container_width=True  # Largeur complète
+                # --- VÉRIFICATION DE LA PRÉSENCE DE DEALS À AFFICHER ---
+                if deals_to_display:
+                    # En-tête conditionnel selon le type de deals affichés
+                    if has_relevant:
+                        # Affichage pour les deals pertinents
+                        st.subheader(
+                            f" {len(relevant_deals)} Deal(s) Pertinent(s)"
                         )
                     else:
-                        # Message informatif si pas de lien disponible
-                        st.info("ℹ️ Lien indisponible")
-
-                    # Séparateur entre chaque deal
-                    st.divider()
+                        # Affichage pour les suggestions alternatives
+                        st.subheader(
+                            f"🔍 {len(results)} Suggestion(s) Similaire(s)"
+                        )
                     
-            else:
-                # --- AUCUN RÉSULTAT TROUVÉ ---
-                # Message d'avertissement en cas de recherche infructueuse
-                st.warning(
-                    "Aucun deal ne correspond. "
-                    "Vérifiez l'index vectoriel Atlas."
-                )
+                    # --- BOUCLE D'AFFICHAGE DES DEALS ---
+                    # Itération sur chaque deal à afficher
+                    for deal in deals_to_display:
+                        # --- EXTRACTION DES DONNÉES ---
+                        # Récupération sécurisée avec valeurs par défaut
+                        title = deal.get('title', 'Sans titre')
+                        price = deal.get('price', 0)
+                        
+                        # --- AFFICHAGE DU TITRE ET DU PRIX ---
+                        # Utilisation de Markdown pour le formatage
+                        # :orange[] colore le texte en orange
+                        st.markdown(f"### :orange[{title}] — **{price}€**")
+
+                        # --- MÉTADONNÉES EN LIGNE UNIQUE ---
+                        # Préparation de la prédiction ML si disponible
+                        pred_text = ""
+                        if deal.get('is_new') or (show_only_new and deal.get('popularity_confidence') is not None):
+                            conf = deal.get('popularity_confidence', 0)
+                            if conf >= 0.5:
+                                pred_text = f"**Prédiction ML:** CHAUD 🔥 | **Fiabilité:** {round(conf * 100)}%"
+                            else:
+                                pred_text = f"**Prédiction ML:** FROID ❄️ | **Fiabilité:** {round(conf * 100)}%"
+                        
+                        # Création de 5 colonnes pour tous les éléments
+                        col1, col2, col3, col4, col5 = st.columns(5)
+                        
+                        # Colonne 1 : Température du deal
+                        with col1:
+                            temp_rating = deal.get('temperature_rating', 0)
+                            if temp_rating >= 100:
+                                temp_icon = "🔥"
+                            elif temp_rating >= 50:
+                                temp_icon = "🌡️"
+                            else:
+                                temp_icon = "❄️"
+                            st.caption(f"{temp_icon} Temp : {temp_rating}°C")
+                        
+                        # Colonne 2 : Statut du deal
+                        with col2:
+                            is_new = deal.get('is_new', False)
+                            status_text = "Nouveau" if is_new else "Ancien"
+                            st.caption(f"Statut : {status_text}")
+                        
+                        # Colonne 3 : Score de pertinence
+                        with col3:
+                            score_pct = round(deal.get('score', 0) * 100, 1)
+                            st.caption(f"Pertinence : {score_pct}%")
+                        
+                        # Colonne 4 : Avis communauté
+                        with col4:
+                            sentiment_score = deal.get('comments_sentiment_score')
+                            if sentiment_score is not None:
+                                if sentiment_score >= 4.5:
+                                    stars = "⭐⭐⭐⭐⭐"
+                                elif sentiment_score >= 3.5:
+                                    stars = "⭐⭐⭐⭐"
+                                elif sentiment_score >= 2.5:
+                                    stars = "⭐⭐⭐"
+                                elif sentiment_score >= 1.5:
+                                    stars = "⭐⭐"
+                                else:
+                                    stars = "⭐"
+                                st.caption(f"💬 {stars} ({round(sentiment_score, 1)}/5)")
+                            else:
+                                st.caption(f"💬 Pas d'avis")
+                        
+                        # Colonne 5 : Prédiction ML si disponible
+                        with col5:
+                            if pred_text:
+                                st.caption(pred_text)
+
+                        # --- DESCRIPTION DÉTAILLÉE (EXPANDER) ---
+                        # Vérification de la présence du champ 'text'
+                        if "text" in deal:
+                            # Widget expander pour afficher/masquer les détails
+                            with st.expander(
+                                "Voir les détails et la description complète"
+                            ):
+                                # Nettoyage du texte : ajout de sauts de ligne
+                                # après chaque point pour améliorer la lisibilité
+                                clean_text = deal["text"].replace(". ", ".\n\n")
+                                st.write(clean_text)
+
+                        # --- BOUTON D'ACTION ---
+                        # Vérification de la présence et validité de l'URL
+                        if "url" in deal and deal["url"]:
+                            # Bouton lien vers le deal sur Dealabs
+                            st.link_button(
+                                "🚀 PROFITER DE L'OFFRE SUR LE SITE",
+                                deal["url"],
+                                use_container_width=True  # Largeur complète
+                            )
+                        else:
+                            # Message informatif si pas de lien disponible
+                            st.info("ℹ️ Lien indisponible")
+
+                        # Séparateur entre chaque deal
+                        st.divider()
+                        
+                else:
+                    # --- AUCUN RÉSULTAT TROUVÉ ---
+                    # Message adapté selon le mode actif
+                    if show_only_new:
+                        # Mode Anticipation actif : message spécifique
+                        st.info(
+                            "🔮 Aucun nouveau deal prometteur détecté pour cette recherche. "
+                            "Essayez de désactiver le Mode Anticipation pour voir tous les résultats."
+                        )
+                    else:
+                        # Recherche classique : message d'erreur technique
+                        st.warning(
+                            "Aucun deal ne correspond. "
+                            "Vérifiez l'index vectoriel Atlas."
+                        )
 
 
 # --- POINT D'ENTRÉE DU PROGRAMME ---
