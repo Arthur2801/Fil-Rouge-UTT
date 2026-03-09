@@ -56,7 +56,7 @@ def get_llm_answer(query, context_documents):
     
     Processus:
         1. Récupération de la clé API GROQ depuis l'environnement
-        2. Initialisation du modèle LLM (llama-3.3-70b-versatile)
+        2. Initialisation du modèle LLM (llama-3.1-8b-instant)
         3. Construction du prompt avec instructions et contexte
         4. Préparation du contexte (fusion des textes des deals)
         5. Exécution de la chaîne LangChain
@@ -86,11 +86,11 @@ def get_llm_answer(query, context_documents):
     # --- INITIALISATION DU LLM ---
     # Configuration du client GROQ avec:
     # - groq_api_key: authentification
-    # - model_name: llama-3.3-70b-versatile (modèle puissant et rapide)
+    # - model_name: llama-3.1-8b-instant (modèle rapide et léger)
     # - temperature: 0 (réponses déterministes, pas de créativité)
     llm = ChatGroq(
         groq_api_key=api_key,
-        model_name="llama-3.3-70b-versatile",
+        model_name="llama-3.1-8b-instant",
         temperature=0
     )
 
