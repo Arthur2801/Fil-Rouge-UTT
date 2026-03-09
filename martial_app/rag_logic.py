@@ -91,18 +91,24 @@ def get_llm_answer(query, context_documents):
     # Template de prompt avec instructions détaillées pour le LLM
     # Utilise des placeholders {context} et {question}
     template = """
-    Tu es un assistant expert en bons plans Dealabs. 
-    Analyse les deals fournis ci-dessous et aide l'utilisateur à faire le 
-    meilleur choix.
-    
-    Instructions :
-    - Si la question porte directement sur les deals fournis, réponds de 
-      manière précise et comparative.
-    - Si la question ne peut pas être répondue avec les deals fournis, 
-      explique brièvement pourquoi, puis présente quand même les deals 
-      trouvés en expliquant en quoi ils peuvent être pertinents.
-    - Compare les prix, caractéristiques et avantages des différents deals.
-    - Sois concis mais informatif (maximum 150 mots).
+    Tu es un assistant expert en bons plans pour la plateforme Dealabs. Ton rôle est de conseiller l'utilisateur avec honnêteté et précision. 
+    Pour chaque deal, tu disposes de trois indicateurs clés :
+    1. Prédiction ML (Potentiel) : Ce que notre IA prévoit pour le futur du deal.
+    2. Fiabilité : Le degré de certitude de cette prédiction.
+    3. Sentiment Social : La note moyenne des avis des membres (si disponible).
+
+    ### RÈGLES D'INTERPRÉTATION ET DE CONSEIL :
+    - Si la Prédiction est "CHAUD" avec une Fiabilité > 85% : Recommande vivement le deal comme une opportunité rare.
+    - Si le Sentiment Social est élevé (> 4/5) : Utilise-le pour valider la qualité réelle du produit ("La communauté confirme que...").
+    - Cas particulier (Aucun avis) : Si le score de sentiment est absent (null), explique à l'utilisateur que le deal est très récent et que c'est une exclusivité où il peut être le premier à profiter de l'offre grâce à notre détection IA.
+    - Si l'IA prédit un deal "CHAUD" mais que le sentiment social est bas (< 2.5/5) : Sois prudent. Avertis l'utilisateur que malgré le bon prix, les retours des membres sont mitigés.
+
+    ### TON ET POSTURE :
+    - Reste toujours factuel et bienveillant. 
+    - Ne force pas l'achat, suggère l'opportunité. 
+    - Utilise un langage clair : parle de "Potentiel détecté par notre IA" et de "Retour de la communauté".
+    - Réponds toujours en français.
+    - Sois concis mais informatif (maximum 200 mots).
 
     CONTEXTE (Deals trouvés) :
     {context}
@@ -117,12 +123,31 @@ def get_llm_answer(query, context_documents):
     prompt = ChatPromptTemplate.from_template(template)
 
     # --- PRÉPARATION DU CONTEXTE ---
-    # Fusion de tous les textes des deals en un seul string
+    # Fusion de tous les textes des deals avec leurs métadonnées ML
     # Séparés par deux retours à la ligne pour la lisibilité
-    # Utilisation de .get() pour éviter les KeyError si 'text' manque
-    context_text = "\n\n".join([
-        doc.get('text', '') for doc in context_documents
-    ])
+    # Utilisation de .get() pour éviter les KeyError si des champs manquent
+    context_parts = []
+    for doc in context_documents:
+        # Construction du texte enrichi avec métadonnées ML
+        deal_info = f"DEAL: {doc.get('text', 'Description non disponible')}\n"
+        deal_info += f"Prix: {doc.get('price', 'N/A')}€\n"
+        
+        # Ajout de la prédiction ML si disponible
+        if doc.get('popularity_prediction'):
+            pred = doc.get('popularity_prediction')
+            conf = doc.get('popularity_confidence', 0)
+            deal_info += f"Prédiction ML: {pred} (Fiabilité: {round(conf * 100)}%)\n"
+        
+        # Ajout du sentiment social si disponible
+        sentiment = doc.get('comments_sentiment_score')
+        if sentiment is not None:
+            deal_info += f"Sentiment Social: {round(sentiment, 1)}/5\n"
+        else:
+            deal_info += "Sentiment Social: Aucun avis (Deal très récent)\n"
+        
+        context_parts.append(deal_info)
+    
+    context_text = "\n\n".join(context_parts)
 
     # --- GÉNÉRATION DE LA RÉPONSE ---
     # Construction de la chaîne LangChain : prompt | llm
