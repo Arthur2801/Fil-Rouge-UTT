@@ -287,8 +287,8 @@ def main():
                             # Conversion de la confiance en pourcentage
                             confidence_pct = round(confidence * 100, 1)
 
-                            # Badge de couleur selon la prédiction
-                            if confidence >= 0.5:
+                            # Badge de couleur selon la prédiction ML
+                            if prediction == "CHAUD":
                                 badge_color = "🔥"
                                 pred_text = t["hot"]
                             else:
@@ -331,10 +331,11 @@ def main():
                         # Préparation de la prédiction ML si disponible
                         pred_text = ""
                         if deal.get("is_new") or (
-                            show_only_new and deal.get("popularity_confidence") is not None
+                            show_only_new and deal.get("popularity_prediction") is not None
                         ):
+                            pred = deal.get("popularity_prediction", "N/A")
                             conf = deal.get("popularity_confidence", 0)
-                            if conf >= 0.5:
+                            if pred == "CHAUD":
                                 pred_text = f"**{t['prediction_ml']}:** {t['hot']} 🔥 | **{t['reliability']}:** {round(conf * 100)}%"
                             else:
                                 pred_text = f"**{t['prediction_ml']}:** {t['cold']} ❄️ | **{t['reliability']}:** {round(conf * 100)}%"

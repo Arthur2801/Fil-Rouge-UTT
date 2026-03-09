@@ -567,9 +567,9 @@ def get_deals_rag(query, max_price=1200):
     results = list(collection.aggregate(pipeline))
 
     # Tri pour faire remonter les deals prometteurs :
-    # - is_new = True (nouveaux deals)
-    # - popularity_confidence >= 0.5 (prédiction "CHAUD")
-    # Les deals "CHAUD" (conf >= 0.5) remontent avant les "FROID" (conf < 0.5)
+    # - is_new = True (nouveaux deals en priorité)
+    # - popularity_confidence (confiance la plus élevée en premier)
+    # Note : Le statut CHAUD/FROID est déterminé par popularity_prediction
     results.sort(
         key=lambda x: (x.get("is_new", False), x.get("popularity_confidence", 0)),
         reverse=True,
