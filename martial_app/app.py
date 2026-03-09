@@ -277,37 +277,19 @@ def main():
                             temp_icon = "❄️"  # Froid
                         st.caption(f"{temp_icon} Température : {temp_dealabs}°")
                     
-                    # Colonne 2 : Durée depuis la publication
+                    # Colonne 2 : Statut du deal (Nouveau/Ancien)
                     with col2:
-                        from datetime import datetime, timezone
-                        deal_timestamp = deal.get('submitted')
-                        if deal_timestamp:
-                            # Conversion du timestamp Unix en datetime
-                            deal_datetime = datetime.fromtimestamp(deal_timestamp, tz=timezone.utc)
-                            
-                            # Calcul de la durée
-                            now = datetime.now(timezone.utc)
-                            delta = now - deal_datetime
-                            hours = delta.total_seconds() / 3600
-                            
-                            if hours < 24:
-                                # Affichage en heures
-                                duration = f"{int(hours)}h"
-                            elif hours < 24 * 7:
-                                # Affichage en jours
-                                days = int(hours / 24)
-                                duration = f"{days}j"
-                            elif hours < 24 * 30:
-                                # Affichage en semaines
-                                weeks = int(hours / (24 * 7))
-                                duration = f"{weeks}sem"
-                            else:
-                                # Affichage en mois
-                                months = int(hours / (24 * 30))
-                                duration = f"{months}mois"
-                            st.caption(f"⏱️ Durée : {duration}")
+                        # Détermination du statut basé sur is_new
+                        is_new = deal.get('is_new', False)
+                        if is_new:
+                            status = "Nouveau"
+                            status_icon = "✨"
+                            status_color = "🟢"
                         else:
-                            st.caption("⏱️ Durée : N/A")
+                            status = "Ancien"
+                            status_icon = "📦"
+                            status_color = "⚪"
+                        st.caption(f"{status_color} Statut : {status_icon} {status}")
                     
                     # Colonne 3 : Score de pertinence en pourcentage
                     with col3:
