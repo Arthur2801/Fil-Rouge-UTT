@@ -290,15 +290,13 @@ def main():
                             # Badge de couleur selon la prédiction ML
                             if prediction == "CHAUD":
                                 badge_color = "🔥"
-                                pred_text = t["hot"]
                             else:
                                 badge_color = "❄️"
-                                pred_text = t["cold"]
 
                             # Affichage de l'analyse pour ce deal
                             st.info(
                                 f"**{t['deal_number']}{idx}** : {title[:50]}...\n\n"
-                                f"{badge_color} **{t['potential']} : {pred_text}** | "
+                                f"{badge_color} **{t['potential']} : {prediction}** | "
                                 f"**{t['reliability']} : {confidence_pct}%**"
                             )
 
@@ -336,9 +334,9 @@ def main():
                             pred = deal.get("popularity_prediction", "N/A")
                             conf = deal.get("popularity_confidence", 0)
                             if pred == "CHAUD":
-                                pred_text = f"**{t['prediction_ml']}:** {t['hot']} 🔥 | **{t['reliability']}:** {round(conf * 100)}%"
+                                pred_text = f"**{t['prediction_ml']}:** {pred} 🔥 | **{t['reliability']}:** {round(conf * 100)}%"
                             else:
-                                pred_text = f"**{t['prediction_ml']}:** {t['cold']} ❄️ | **{t['reliability']}:** {round(conf * 100)}%"
+                                pred_text = f"**{t['prediction_ml']}:** {pred} ❄️ | **{t['reliability']}:** {round(conf * 100)}%"
 
                         # Création de 5 colonnes pour tous les éléments
                         col1, col2, col3, col4, col5 = st.columns(5)
