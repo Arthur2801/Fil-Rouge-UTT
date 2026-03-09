@@ -302,13 +302,8 @@ def main():
                     # Colonne 2 : Statut du deal
                     with col2:
                         is_new = deal.get('is_new', False)
-                        if is_new:
-                            status_circle = "🟢"  # Cercle vert plein
-                            status_text = "Nouveau"
-                        else:
-                            status_circle = "⚪"  # Cercle gris transparent
-                            status_text = "Ancien"
-                        st.caption(f"Statut : {status_text} {status_circle}")
+                        status_text = "Nouveau" if is_new else "Ancien"
+                        st.caption(f"Statut : {status_text}")
                     
                     # Colonne 3 : Score de pertinence
                     with col3:
