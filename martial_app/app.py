@@ -341,7 +341,7 @@ def main():
 
                         # Colonne 1 : Température du deal
                         with col1:
-                            temp_rating = deal.get("new_temperature_rating", 0)
+                            temp_rating = deal.get("temperature_rating", 0)
                             if temp_rating >= 100:
                                 temp_icon = "🔥"
                             elif temp_rating >= 50:
