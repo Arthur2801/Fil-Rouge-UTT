@@ -39,13 +39,18 @@ from langchain_core.runnables import RunnablePassthrough  # Chaînes LangChain
 load_dotenv()
 
 
-def get_llm_answer(query, context_documents):
+def get_llm_answer(query, context_documents, user_lang="fr"):
     """
     Génère une réponse intelligente en utilisant un LLM (GROQ).
     
     Cette fonction prend une requête utilisateur et des documents de contexte
     (deals trouvés), puis utilise un modèle de langage pour générer une
-    réponse pertinente et comparative.
+    réponse pertinente et comparative dans la langue de l'utilisateur.
+    
+    Args:
+        query (str): La question/requête de l'utilisateur.
+        context_documents (list): Liste de dictionnaires contenant les deals.
+        user_lang (str): Code langue de l'utilisateur (fr, en, es, etc.)
     
     Processus:
         1. Récupération de la clé API GROQ depuis l'environnement
@@ -107,7 +112,7 @@ def get_llm_answer(query, context_documents):
     - Reste toujours factuel et bienveillant. 
     - Ne force pas l'achat, suggère l'opportunité. 
     - Utilise un langage clair : parle de "Potentiel détecté par notre IA" et de "Retour de la communauté".
-    - Réponds toujours en français.
+    - Réponds TOUJOURS dans la langue utilisée par l'utilisateur dans sa question.
     - Sois concis mais informatif (maximum 200 mots).
 
     CONTEXTE (Deals trouvés) :

@@ -18,6 +18,7 @@ import os
 
 # Imports de bibliothèques tierces
 import streamlit as st
+import streamlit.components.v1 as components
 from PIL import Image
 
 # Imports locaux depuis le module rag_logic
@@ -25,6 +26,56 @@ from rag_logic import (
     get_deals_rag,
     get_llm_answer
 )
+
+
+def detect_browser_language():
+    """
+    Détecte la langue du navigateur de l'utilisateur via JavaScript.
+    
+    Returns:
+        str: Code langue détecté (fr, en, es, etc.)
+    """
+    # Si la langue est déjà détectée dans session_state, on la retourne
+    if 'browser_lang' in st.session_state and st.session_state.browser_lang:
+        return st.session_state.browser_lang
+    
+    # Script JavaScript pour détecter la langue du navigateur
+    js_code = """
+    <script>
+        // Récupération de la langue du navigateur
+        var userLang = navigator.language || navigator.userLanguage;
+        
+        // Extraction du code langue (ex: fr-FR -> fr)
+        var langCode = userLang.split('-')[0].toLowerCase();
+        
+        // Langues supportées
+        var supportedLangs = ['fr', 'en', 'es'];
+        
+        // Si la langue n'est pas supportée, on utilise l'anglais par défaut
+        if (!supportedLangs.includes(langCode)) {
+            langCode = 'en';
+        }
+        
+        // Redirection avec le paramètre de langue
+        var url = new URL(window.location.href);
+        if (!url.searchParams.has('lang')) {
+            url.searchParams.set('lang', langCode);
+            window.location.href = url.toString();
+        }
+    </script>
+    """
+    
+    # Exécution du JavaScript
+    components.html(js_code, height=0)
+    
+    # Récupération du paramètre lang de l'URL
+    query_params = st.query_params
+    detected_lang = query_params.get('lang', 'fr')
+    
+    # Stockage dans session_state
+    st.session_state.browser_lang = detected_lang
+    
+    return detected_lang
 
 
 def main():
@@ -47,6 +98,9 @@ def main():
         page_icon="🔥",  # Icône dans l'onglet du navigateur
         layout="wide"  # Mode large pour plus d'espace horizontal
     )
+
+    # --- DÉTECTION AUTOMATIQUE DE LA LANGUE DU NAVIGATEUR ---
+    user_lang = detect_browser_language()
 
     # --- GESTION DU LOGO DANS LA SIDEBAR ---
     # Récupération du chemin absolu du répertoire courant
@@ -201,7 +255,7 @@ def main():
                         # - Construction du prompt avec contexte
                         # - Envoi au LLM (GROQ)
                         # - Récupération et affichage de la réponse
-                        answer = get_llm_answer(query, deals_to_analyze)
+                        answer = get_llm_answer(query, deals_to_analyze, user_lang)
                         st.write(answer)
                         
                     except Exception as e:
