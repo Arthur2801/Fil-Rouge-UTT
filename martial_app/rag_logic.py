@@ -123,6 +123,21 @@ def get_llm_answer(query, context_documents):
     - Utilise un langage clair : parle de "Potentiel détecté par notre IA" et de "Retour de la communauté".
     - Sois concis mais informatif (maximum 200 mots).
 
+    ### ENGAGEMENT CONVERSATIONNEL (OBLIGATOIRE) :
+    **Chaque réponse doit impérativement se terminer par une question ouverte ou une suggestion de recherche liée au contexte.**
+    
+    Propose par exemple :
+    - D'affiner la recherche par budget ou par catégorie spécifique
+    - De comparer ce deal avec un autre modèle ou marque alternative
+    - De chercher dans une catégorie complémentaire (ex: accessoires pour le produit trouvé, housse, garantie étendue)
+    - De vérifier si des deals similaires avec une meilleure fiabilité IA ou un meilleur sentiment social existent
+    - De consulter d'autres offres dans une gamme de prix différente
+    
+    Exemples de fin de réponse :
+    - "Souhaitez-vous que je cherche des offres similaires sur d'autres marques ?"
+    - "Préférez-vous que je trouve des accessoires en promotion pour accompagner cet achat ?"
+    - "Voulez-vous explorer des options dans une gamme de prix supérieure avec de meilleures spécifications ?"
+
     CONTEXTE (Deals trouvés) :
     {context}
 
