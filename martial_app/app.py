@@ -73,9 +73,9 @@ def main():
 
     # --- NOUVEAU : FILTRE POUR LES DEALS PRÉDITS PAR LE ML ---
     st.sidebar.divider()  # Petite ligne de séparation
-    st.sidebar.subheader("🔥 Mode Anticipation")
+    st.sidebar.subheader("Futurs Tops Deals")
     # Ce toggle permet d'activer le filtre "Nouveaux deals prometteurs"
-    show_only_new = st.sidebar.toggle("Nouveaux deals prometteurs uniquement")
+    show_only_new = st.sidebar.toggle("Afficher uniquement les futurs tops deals", value=False)
 
     # --- ZONE PRINCIPALE : TITRE ET BARRE DE RECHERCHE ---
     # Affichage du titre principal de l'application
@@ -255,7 +255,7 @@ def main():
                 if has_relevant:
                     # Affichage pour les deals pertinents
                     st.subheader(
-                        f"📌 {len(relevant_deals)} Deal(s) Pertinent(s)"
+                        f" {len(relevant_deals)} Deal(s) Pertinent(s)"
                     )
                 else:
                     # Affichage pour les suggestions alternatives
