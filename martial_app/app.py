@@ -44,7 +44,8 @@ def main():
     # Configuration initiale de la page web (titre, icône)
     st.set_page_config(
         page_title="Dealabs Smart Search",  # Titre dans l'onglet du navigateur
-        page_icon="🔥"  # Icône dans l'onglet du navigateur
+        page_icon="🔥",  # Icône dans l'onglet du navigateur
+        layout="wide"  # Mode large pour plus d'espace horizontal
     )
 
     # --- GESTION DU LOGO DANS LA SIDEBAR ---
@@ -281,9 +282,9 @@ def main():
                     if deal.get('is_new') or (show_only_new and deal.get('popularity_confidence') is not None):
                         conf = deal.get('popularity_confidence', 0)
                         if conf >= 0.5:
-                            pred_text = f"Prédiction ML : CHAUD 🔥 ({round(conf * 100)}%)"
+                            pred_text = f"🏆 **Prédiction ML:** CHAUD 🔥 | **Fiabilité:** {round(conf * 100)}%"
                         else:
-                            pred_text = f"Prédiction ML : FROID ❄️ ({round(conf * 100)}%)"
+                            pred_text = f"🏆 **Prédiction ML:** FROID ❄️ | **Fiabilité:** {round(conf * 100)}%"
                     
                     # Création de 5 colonnes pour tous les éléments
                     col1, col2, col3, col4, col5 = st.columns(5)
