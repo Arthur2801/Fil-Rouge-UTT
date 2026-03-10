@@ -35,9 +35,14 @@ langchain-huggingface>=0.0.1
 # Modèles de sentence embeddings (all-MiniLM-L6-v2)
 sentence-transformers>=2.2.0
 
+# --- SÉCURITÉ & RÉSEAU ---
+# Certifi pour les certificats SSL (connexions HTTPS/MongoDB Atlas)
+# IMPORTANT: Doit être installé AVANT torch pour éviter les conflits avec --extra-index-url
+certifi>=2023.7.22
+
 # --- DEEP LEARNING ---
 # PyTorch CPU-only (léger pour Streamlit Cloud)
-# --extra-index-url permet d'utiliser l'index CPU de PyTorch
+# Note: --extra-index-url peut causer des warnings avec uv, mais pip gère correctement
 --extra-index-url https://download.pytorch.org/whl/cpu
 torch>=2.0.0
 
@@ -51,10 +56,6 @@ numpy>=1.24.0
 
 # Scikit-learn pour les métriques de similarité
 scikit-learn>=1.3.0
-
-# --- SÉCURITÉ & RÉSEAU ---
-# Certifi pour les certificats SSL (connexions HTTPS/MongoDB Atlas)
-certifi>=2023.7.22
 
 # ==============================================================================
 # NOTES DE DÉPLOIEMENT :
