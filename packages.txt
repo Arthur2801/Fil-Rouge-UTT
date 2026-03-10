@@ -1,8 +1,0 @@
-# ==============================================================================
-# PACKAGES.TXT - Packages système pour Streamlit Cloud
-# ==============================================================================
-# Ce fichier force Streamlit Cloud à utiliser pip au lieu de uv
-# pour éviter les problèmes de résolution avec --extra-index-url
-# ==============================================================================
-# Note: Laissé vide intentionnellement - aucun package système requis
-# ==============================================================================

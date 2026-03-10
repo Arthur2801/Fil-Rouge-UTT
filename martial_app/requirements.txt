@@ -35,16 +35,14 @@ langchain-huggingface>=0.0.1
 # Modèles de sentence embeddings (all-MiniLM-L6-v2)
 sentence-transformers>=2.2.0
 
+# --- DEEP LEARNING ---
+# PyTorch (version disponible sur PyPI)
+# Note: Pour CPU-only optimisé, spécifier torch==2.x.x+cpu si besoin
+torch>=2.0.0
+
 # --- SÉCURITÉ & RÉSEAU ---
 # Certifi pour les certificats SSL (connexions HTTPS/MongoDB Atlas)
-# IMPORTANT: Doit être installé AVANT torch pour éviter les conflits avec --extra-index-url
 certifi>=2023.7.22
-
-# --- DEEP LEARNING ---
-# PyTorch CPU-only (léger pour Streamlit Cloud)
-# Note: --extra-index-url peut causer des warnings avec uv, mais pip gère correctement
---extra-index-url https://download.pytorch.org/whl/cpu
-torch>=2.0.0
 
 # --- TRAITEMENT D'IMAGES ---
 # Pillow pour charger et afficher le logo
